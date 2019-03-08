@@ -21,11 +21,14 @@ import c.local.com.example.dummy.DummyContent.DummyItem;
  */
 public class ItemFragment extends Fragment {
 
+	// qitta API https://qiita.com/api/v2/items?page=1&per_page=20
+
 	// TODO: Customize parameter argument names
 	private static final String ARG_COLUMN_COUNT = "column-count";
 	// TODO: Customize parameters
 	private int mColumnCount = 1;
 	private OnListFragmentInteractionListener mListener;
+	private MyItemRecyclerViewAdapter adapter;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,6 +54,7 @@ public class ItemFragment extends Fragment {
 		if (getArguments() != null) {
 			mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
 		}
+		adapter = new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener);
 	}
 
 	@Override
@@ -67,12 +71,15 @@ public class ItemFragment extends Fragment {
 			} else {
 				recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
 			}
-			recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+			recyclerView.setAdapter(adapter);
 		}
 		return view;
 	}
 
-
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+	}
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
