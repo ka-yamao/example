@@ -5,10 +5,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import c.local.com.example.dummy.DummyContent;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import c.local.com.example.data.Item;
 
 public class MainActivity extends AppCompatActivity implements ItemFragment.OnListFragmentInteractionListener {
 
@@ -31,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
 		 */
 
 
-
 		// QiitaのAPI：https://qiita.com/api/v2/items?page=1&per_page=20
 
 
@@ -43,27 +39,24 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnLi
 //		pool.scheduleWithFixedDelay(new Thread(() -> test()), 1000,3000, TimeUnit.MILLISECONDS);
 
 
-
 //		Completable.fromAction(() -> test())
 //				.subscribeOn(Schedulers.newThread())
 //				.subscribe();
 
 
-
-
-		Single.create(emitter -> search()).subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(bbb -> {
-					Log.d("★★", bbb.toString());
-
-				});
+//		Single.create(emitter -> search()).subscribeOn(Schedulers.io())
+//				.observeOn(AndroidSchedulers.mainThread())
+//				.subscribe(bbb -> {
+//					Log.d("★★", bbb.toString());
+//
+//				});
 
 		ft.replace(R.id.content, new ItemFragment());
 		ft.commit();
 	}
 
 	@Override
-	public void onListFragmentInteraction(DummyContent.DummyItem item) {
+	public void onListFragmentInteraction(Item item) {
 
 	}
 

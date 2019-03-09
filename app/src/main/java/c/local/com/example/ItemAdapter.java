@@ -1,28 +1,24 @@
 package c.local.com.example;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
 
 import c.local.com.example.ItemFragment.OnListFragmentInteractionListener;
-import c.local.com.example.dummy.DummyContent.DummyItem;
+import c.local.com.example.data.Item;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
 
-	private final List<DummyItem> mValues;
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+
+	private final List<Item> mValues;
 	private final OnListFragmentInteractionListener mListener;
 
-	public MyItemRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+	public ItemAdapter(List<Item> items, OnListFragmentInteractionListener listener) {
 		mValues = items;
 		mListener = listener;
 	}
@@ -37,11 +33,10 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 	@Override
 	public void onBindViewHolder(final ViewHolder holder, int position) {
 		holder.mItem = mValues.get(position);
-		holder.mIdView.setText(mValues.get(position).id);
-		holder.mContentView.setText(mValues.get(position).content);
-		holder.mButton.setText("Button" + mValues.get(position).id);
+		holder.title.setText(mValues.get(position).getTitle());
+		holder.body.setText(Html.fromHtml(mValues.get(position).getBody()));
 
-		holder.mView.setOnClickListener(new View.OnClickListener() {
+		holder.view.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (null != mListener) {
@@ -59,23 +54,22 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 	}
 
 	public class ViewHolder extends RecyclerView.ViewHolder {
-		public final View mView;
-		public final TextView mIdView;
-		public final TextView mContentView;
-		public final Button mButton;
-		public DummyItem mItem;
+		public final View view;
+		public final TextView title;
+		public final TextView body;
+
+		public Item mItem;
 
 		public ViewHolder(View view) {
 			super(view);
-			mView = view;
-			mIdView = (TextView) view.findViewById(R.id.item_number);
-			mContentView = (TextView) view.findViewById(R.id.content);
-			mButton = view.findViewById(R.id.button);
+			this.view = view;
+			title = (TextView) view.findViewById(R.id.title);
+			body = (TextView) view.findViewById(R.id.body);
 		}
 
 		@Override
 		public String toString() {
-			return super.toString() + " '" + mContentView.getText() + "'";
+			return super.toString() + " '" + body.getText() + "'";
 		}
 	}
 }

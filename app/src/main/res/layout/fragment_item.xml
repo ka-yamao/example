@@ -2,28 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  android:layout_width="wrap_content"
 			  android:layout_height="wrap_content"
-			  android:orientation="horizontal">
+			  xmlns:tools="http://schemas.android.com/tools"
+			  android:orientation="vertical">
 
 	<TextView
-		android:id="@+id/item_number"
+		android:id="@+id/title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_margin="@dimen/text_margin"
-		android:textAppearance="?attr/textAppearanceListItem"/>
+		android:textStyle="bold"
+		android:textAppearance="?attr/textAppearanceListItem"
+		tools:text="タイトル"/>
 
 	<TextView
-		android:id="@+id/content"
+		android:id="@+id/body"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_margin="@dimen/text_margin"
-		android:textAppearance="?attr/textAppearanceListItem"/>
-
-	<Button
-		android:id="@+id/button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-		android:text="Button"/>
-
+		android:lineSpacingMultiplier="1.3"
+		android:textAppearance="?attr/textAppearanceListItem"
+		tools:text="ボディー"/>
 
 </LinearLayout>
