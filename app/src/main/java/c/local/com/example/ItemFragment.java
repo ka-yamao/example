@@ -1,5 +1,6 @@
 package c.local.com.example;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,11 +16,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import c.local.com.example.data.Item;
 import c.local.com.example.data.User;
-import io.reactivex.Single;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -29,10 +32,12 @@ public class ItemFragment extends Fragment {
 	private ItemAdapter adapter;
 	private List<Item> items = new ArrayList<>();
 	private HttpAsync task;
+	private Disposable disposable;
 
 	public ItemFragment() {
 	}
 
+	@SuppressLint("CheckResult")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,17 +49,73 @@ public class ItemFragment extends Fragment {
 //		task.execute();
 
 
-		Single.create(subscriber -> {
-			String json = HttpConnection.getQiita();
-			subscriber.onSuccess(json);
+//		Single.create(subscriber -> {
+//			String json = HttpConnection.getQiita();
+//			subscriber.onSuccess(json);
+//		}).subscribeOn(Schedulers.io())
+//				.observeOn(AndroidSchedulers.mainThread())
+//				.subscribe(result -> Log.d("★", result.toString()));
 
-		}).subscribeOn(Schedulers.io())
+
+//		List<String> textList = new ArrayList<>();
+//		textList.add("hoge");
+//		textList.add("fuga");
+//		textList.add("piyo");
+//		textList.add("nya-");
+//		textList.add("nya-");
+//		textList.add("nya-");
+//		textList.add("nya-");
+//		textList.add("nya-");
+
+//		disposable = Observable.interval(5, TimeUnit.SECONDS).take(10)
+//				.subscribeOn(Schedulers.io())
+//				.observeOn(AndroidSchedulers.mainThread()).subscribe(json -> {
+//
+//					Log.d("★", String.valueOf(json));
+//				});
+
+//		disposable = getList()
+//				.subscribeOn(Schedulers.io())
+//				.observeOn(AndroidSchedulers.mainThread()).subscribe(json -> {
+//
+//					Log.d("★", String.valueOf(json));
+//				});
+
+
+		disposable = getList()
+				.repeatWhen(observable -> observable.delay(3, TimeUnit.SECONDS))
+				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(result -> {
-					Log.d("★", result.toString());
+				.subscribe(json -> {
+
+					Log.d("★", String.valueOf(json));
+
+
+				}, json -> {
+
+					Log.d("★", String.valueOf(json));
+
+
+				}, () -> {
+
+					Log.d("★", "");
+
+
 				});
 
 	}
+
+	Observable<String> getList() {
+		return Observable.create(subscriber -> {
+			String json = HttpConnection.getQiita();
+			subscriber.onNext(json);
+			subscriber.onComplete();
+
+			// subscriber.onError(new Exception());
+
+		});
+	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,6 +153,9 @@ public class ItemFragment extends Fragment {
 	public void onDetach() {
 		super.onDetach();
 		mListener = null;
+		if (disposable != null) {
+			disposable.dispose();
+		}
 	}
 
 
@@ -136,4 +200,33 @@ public class ItemFragment extends Fragment {
 			}
 		};
 	}
+
+
+//	Observable<String> getUserInfo(Integer authId) {
+//				return Observable.create((Subscriber<? super String> subscriber) -> {
+//   　　　// 本来以下はWebやDBアクセスなど
+//					try {
+//						System.out.println(String.format("getUserInfo, ThreadName: %s, Params: %d", Thread.currentThread().getName(), authId));
+//						Thread.sleep(2000);
+//						subscriber.onNext("Tom");
+//						subscriber.onCompleted();
+//					} catch (Exception e) {
+//						subscriber.onError(e);
+//					}
+//				}).subscribeOn(Schedulers.io());
+//			}
+//
+//			Observable<List<String>> getUserItems(Integer authId) {
+//				return Observable.create((Subscriber<? super List<String>> subscriber) -> {
+//   　　　// 本来以下はWebやDBアクセスなど
+//					try {
+//						System.out.println(String.format("getUserItems, ThreadName: %s, Params: %d", Thread.currentThread().getName(), authId));
+//						Thread.sleep(3000);
+//						subscriber.onNext(asList("Apple", "Banana"));
+//						subscriber.onCompleted();
+//					} catch (Exception e) {
+//						subscriber.onError(e);
+//					}
+//		}).subscribeOn(Schedulers.io());
+//	}
 }
