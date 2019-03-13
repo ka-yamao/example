@@ -109,18 +109,24 @@ public class ItemFragment extends Fragment {
 	}
 
 
+	/**
+	 * APIで一覧を取得
+	 *
+	 * @return Observable<String>
+	 */
 	private Observable<String> getList() {
 
 		return Observable.create(subscriber -> {
+			// Qiitaの新着10件を取得する
 			String json = HttpConnection.getQiita();
 			subscriber.onNext(json);
 
+			// タイムスタンプの最後が7だったらポーリングを止める
 			String ms = String.valueOf(System.currentTimeMillis());
 			Log.d("★", ms);
 			if (ms.lastIndexOf("7") != 12) {
 				subscriber.onComplete();
 			}
-
 		});
 	}
 
@@ -238,31 +244,4 @@ public class ItemFragment extends Fragment {
 	}
 
 
-//	Observable<String> getUserInfo(Integer authId) {
-//				return Observable.create((Subscriber<? super String> subscriber) -> {
-//   　　　// 本来以下はWebやDBアクセスなど
-//					try {
-//						System.out.println(String.format("getUserInfo, ThreadName: %s, Params: %d", Thread.currentThread().getName(), authId));
-//						Thread.sleep(2000);
-//						subscriber.onNext("Tom");
-//						subscriber.onCompleted();
-//					} catch (Exception e) {
-//						subscriber.onError(e);
-//					}
-//				}).subscribeOn(Schedulers.io());
-//			}
-//
-//			Observable<List<String>> getUserItems(Integer authId) {
-//				return Observable.create((Subscriber<? super List<String>> subscriber) -> {
-//   　　　// 本来以下はWebやDBアクセスなど
-//					try {
-//						System.out.println(String.format("getUserItems, ThreadName: %s, Params: %d", Thread.currentThread().getName(), authId));
-//						Thread.sleep(3000);
-//						subscriber.onNext(asList("Apple", "Banana"));
-//						subscriber.onCompleted();
-//					} catch (Exception e) {
-//						subscriber.onError(e);
-//					}
-//		}).subscribeOn(Schedulers.io());
-//	}
 }
