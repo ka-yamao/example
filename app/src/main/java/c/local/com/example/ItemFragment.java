@@ -3,6 +3,7 @@ package c.local.com.example;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,7 +43,8 @@ public class ItemFragment extends Fragment {
 	private Button asyncTaskButton;
 	private Button rxJavaButton;
 	private Button stopButton;
-	private Observable<String> listObservable;
+	private Handler handler = new Handler();
+	private Runnable polling;
 
 	public ItemFragment() {
 	}
@@ -52,55 +54,71 @@ public class ItemFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+		Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
 		asyncTaskButton = toolbar.findViewById(R.id.asyncTask);
 		rxJavaButton = toolbar.findViewById(R.id.rxJava);
 		stopButton = toolbar.findViewById(R.id.stop);
 
 
-		// AsyncTaskで取得
+		// AsyncTaskでポーリングもどき
 		asyncTaskButton.setOnClickListener(v -> {
+
+			v.setActivated(true);
+
 			if (disposable != null) {
 				disposable.dispose();
 			}
-			// AsyncTaskで非同期通信
-			task = new HttpAsync();
-			task.setListener(createListener());
-			task.execute();
+
+			polling = new Runnable() {
+				@Override
+				public void run() {
+					// AsyncTaskで非同期通信
+					task = new HttpAsync();
+					task.setListener(createListener());
+					task.execute();
+					handler.postDelayed(this, 10000);
+				}
+			};
+
+			handler.postDelayed(polling, 3000);
+
 
 		});
 
 		// RxJavaでポーリングもどき
 		rxJavaButton.setOnClickListener(v -> {
 
+			v.setActivated(true);
 
-			if (listObservable == null) {
-				listObservable = getList()
-						.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
-						.subscribeOn(Schedulers.io())
-						.observeOn(AndroidSchedulers.mainThread());
+			if (handler != null && polling != null) {
+				handler.removeCallbacks(polling);
 			}
 
-			disposable = listObservable
+			disposable = getList()
+					.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe(json -> {
-						// 反映
-						render(json);
-						Log.d("★", "next");
-					}, error -> {
-						Log.d("★", "error" + error.toString());
-					}, () -> {
-						Log.d("★", "complete");
-					});
-
-
+								render(json);
+								Log.d("★", "next");
+							}, error -> Log.d("★", "error")
+							, () -> Log.d("★", "complete")
+					);
 		});
 
 
 		// RxJavaでポーリングもどき
 		stopButton.setOnClickListener(v -> {
 
+			asyncTaskButton.setActivated(false);
+			rxJavaButton.setActivated(false);
+
 			if (disposable != null) {
 				disposable.dispose();
+			}
+
+			if (handler != null && polling != null) {
+				handler.removeCallbacks(polling);
 			}
 
 		});
@@ -201,14 +219,18 @@ public class ItemFragment extends Fragment {
 
 	}
 
+	/**
+	 * @param json
+	 * @return
+	 */
 	private List<Item> parseJson(String json) {
 
 		List<Item> items = new ArrayList<>();
 
-		//Calendarクラスのオブジェクトを生成する
+		// Calendarクラスのオブジェクトを生成する
 		Calendar cl = Calendar.getInstance();
 
-		//SimpleDateFormatクラスでフォーマットパターンを設定する
+		// SimpleDateFormatクラスでフォーマットパターンを設定する
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd 'at' HH:mm:ss");
 		String timestamp = sdf.format(cl.getTime());
 		try {
@@ -224,14 +246,12 @@ public class ItemFragment extends Fragment {
 					item.setBody(jsonObject.getString("rendered_body"));
 					item.setTimestamp(timestamp);
 					JSONObject userObject = jsonObject.getJSONObject("user");
-
 					// ユーザ
 					User user = new User();
 					user.setId(userObject.getString("id"));
 					user.setName(userObject.getString("name"));
 					user.setImage(userObject.getString("profile_image_url"));
 					item.setUser(user);
-
 					items.add(item);
 				}
 			}
@@ -239,7 +259,6 @@ public class ItemFragment extends Fragment {
 		} catch (JSONException e) {
 			Log.d("★", e.toString());
 		}
-
 		return items;
 	}
 

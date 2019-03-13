@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<item name="asyncTask" type="id"/>
+	<item name="toolbar" type="id"/>
+	<item name="rxJava" type="id"/>
+	<item name="stop" type="id"/>
+</resources>
