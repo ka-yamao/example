@@ -13,7 +13,7 @@ public class HttpConnection {
 	public static String getQiita() throws IOException {
 
 		// 使用するサーバーのURLに合わせる
-		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=20";
+		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=10";
 
 		HttpURLConnection httpConn = null;
 		StringBuffer result = new StringBuffer();

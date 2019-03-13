@@ -4,17 +4,23 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +39,10 @@ public class ItemFragment extends Fragment {
 	private List<Item> items = new ArrayList<>();
 	private HttpAsync task;
 	private Disposable disposable;
+	private Button asyncTaskButton;
+	private Button rxJavaButton;
+	private Button stopButton;
+	private Observable<String> listObservable;
 
 	public ItemFragment() {
 	}
@@ -41,81 +51,78 @@ public class ItemFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new ItemAdapter(items, mListener);
 
-		// 非同期通信
-//		task = new HttpAsync();
-//		task.setListener(createListener());
-//		task.execute();
-
-
-//		Single.create(subscriber -> {
-//			String json = HttpConnection.getQiita();
-//			subscriber.onSuccess(json);
-//		}).subscribeOn(Schedulers.io())
-//				.observeOn(AndroidSchedulers.mainThread())
-//				.subscribe(result -> Log.d("★", result.toString()));
+		Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+		asyncTaskButton = toolbar.findViewById(R.id.asyncTask);
+		rxJavaButton = toolbar.findViewById(R.id.rxJava);
+		stopButton = toolbar.findViewById(R.id.stop);
 
 
-//		List<String> textList = new ArrayList<>();
-//		textList.add("hoge");
-//		textList.add("fuga");
-//		textList.add("piyo");
-//		textList.add("nya-");
-//		textList.add("nya-");
-//		textList.add("nya-");
-//		textList.add("nya-");
-//		textList.add("nya-");
+		// AsyncTaskで取得
+		asyncTaskButton.setOnClickListener(v -> {
+			if (disposable != null) {
+				disposable.dispose();
+			}
+			// AsyncTaskで非同期通信
+			task = new HttpAsync();
+			task.setListener(createListener());
+			task.execute();
 
-//		disposable = Observable.interval(5, TimeUnit.SECONDS).take(10)
-//				.subscribeOn(Schedulers.io())
-//				.observeOn(AndroidSchedulers.mainThread()).subscribe(json -> {
-//
-//					Log.d("★", String.valueOf(json));
-//				});
+		});
 
-//		disposable = getList()
-//				.subscribeOn(Schedulers.io())
-//				.observeOn(AndroidSchedulers.mainThread()).subscribe(json -> {
-//
-//					Log.d("★", String.valueOf(json));
-//				});
+		// RxJavaでポーリングもどき
+		rxJavaButton.setOnClickListener(v -> {
 
 
-		disposable = getList()
-				.repeatWhen(observable -> observable.delay(3, TimeUnit.SECONDS))
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(json -> {
+			if (listObservable == null) {
+				listObservable = getList()
+						.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread());
+			}
 
-					Log.d("★", String.valueOf(json));
+			disposable = listObservable
+					.subscribe(json -> {
+						// 反映
+						render(json);
+						Log.d("★", "next");
+					}, error -> {
+						Log.d("★", "error" + error.toString());
+					}, () -> {
+						Log.d("★", "complete");
+					});
 
 
-				}, json -> {
-
-					Log.d("★", String.valueOf(json));
+		});
 
 
-				}, () -> {
+		// RxJavaでポーリングもどき
+		stopButton.setOnClickListener(v -> {
 
-					Log.d("★", "");
+			if (disposable != null) {
+				disposable.dispose();
+			}
 
-
-				});
+		});
+		adapter = new ItemAdapter(getContext(), items, mListener);
 
 	}
 
-	Observable<String> getList() {
+
+	private Observable<String> getList() {
+
 		return Observable.create(subscriber -> {
 			String json = HttpConnection.getQiita();
 			subscriber.onNext(json);
-			subscriber.onComplete();
 
-			// subscriber.onError(new Exception());
+			String ms = String.valueOf(System.currentTimeMillis());
+			Log.d("★", ms);
+			if (ms.lastIndexOf("7") != 12) {
+				subscriber.onComplete();
+			}
 
 		});
 	}
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,10 +131,13 @@ public class ItemFragment extends Fragment {
 		// Set the adapter
 		if (view instanceof RecyclerView) {
 			RecyclerView recyclerView = (RecyclerView) view;
+			// 区切り線設定
+			DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+					new LinearLayoutManager(getActivity()).getOrientation());
+			recyclerView.addItemDecoration(dividerItemDecoration);
+			// Adapterを設定
 			recyclerView.setAdapter(adapter);
 		}
-
-
 		return view;
 	}
 
@@ -166,39 +176,65 @@ public class ItemFragment extends Fragment {
 	private HttpAsync.Listener createListener() {
 		return new HttpAsync.Listener() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(String json) {
 
-				try {
-					if (result != null) {
+				// リストをクリアして、追加
+				render(json);
 
-						JSONArray jsonArray = new JSONArray(result);
-						for (int i = 0; i < jsonArray.length(); i++) {
-
-							Item item = new Item();
-							JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-							item.setId(jsonObject.getString("id"));
-							item.setTitle(jsonObject.getString("title"));
-							item.setBody(jsonObject.getString("rendered_body"));
-							JSONObject userObject = jsonObject.getJSONObject("user");
-
-							User user = new User();
-							user.setId(userObject.getString("id"));
-							user.setName(userObject.getString("name"));
-							user.setImage(userObject.getString("name"));
-							item.setUser(user);
-
-							items.add(item);
-						}
-					}
-
-					// 通知
-					adapter.notifyDataSetChanged();
-
-				} catch (JSONException e) {
-					Log.d("★", e.toString());
-				}
 			}
 		};
+	}
+
+	private void render(String json) {
+
+		// リストをクリアして、追加
+		items.clear();
+		items.addAll(parseJson(json));
+		// 通知
+		adapter.notifyDataSetChanged();
+
+	}
+
+	private List<Item> parseJson(String json) {
+
+		List<Item> items = new ArrayList<>();
+
+		//Calendarクラスのオブジェクトを生成する
+		Calendar cl = Calendar.getInstance();
+
+		//SimpleDateFormatクラスでフォーマットパターンを設定する
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd 'at' HH:mm:ss");
+		String timestamp = sdf.format(cl.getTime());
+		try {
+			if (json != null) {
+				JSONArray jsonArray = new JSONArray(json);
+				for (int i = 0; i < jsonArray.length(); i++) {
+					// アイテム
+					Item item = new Item();
+					JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+					item.setId(jsonObject.getString("id"));
+					item.setTitle(jsonObject.getString("title"));
+					item.setUdate(jsonObject.getString("updated_at").substring(0, 10));
+					item.setBody(jsonObject.getString("rendered_body"));
+					item.setTimestamp(timestamp);
+					JSONObject userObject = jsonObject.getJSONObject("user");
+
+					// ユーザ
+					User user = new User();
+					user.setId(userObject.getString("id"));
+					user.setName(userObject.getString("name"));
+					user.setImage(userObject.getString("profile_image_url"));
+					item.setUser(user);
+
+					items.add(item);
+				}
+			}
+
+		} catch (JSONException e) {
+			Log.d("★", e.toString());
+		}
+
+		return items;
 	}
 
 

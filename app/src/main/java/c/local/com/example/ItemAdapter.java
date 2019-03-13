@@ -1,10 +1,12 @@
 package c.local.com.example;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import java.util.List;
@@ -17,10 +19,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
 	private final List<Item> mValues;
 	private final OnListFragmentInteractionListener mListener;
+	private Animation inAnimation;
+	private Animation outAnimation;
 
-	public ItemAdapter(List<Item> items, OnListFragmentInteractionListener listener) {
+	public ItemAdapter(Context context, List<Item> items, OnListFragmentInteractionListener listener) {
 		mValues = items;
 		mListener = listener;
+		inAnimation = (Animation) AnimationUtils.loadAnimation(context, R.anim.animation);
 	}
 
 	@Override
@@ -34,7 +39,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 	public void onBindViewHolder(final ViewHolder holder, int position) {
 		holder.mItem = mValues.get(position);
 		holder.title.setText(mValues.get(position).getTitle());
-		holder.body.setText(Html.fromHtml(mValues.get(position).getBody()));
+		holder.udate.setText(mValues.get(position).getUdate());
+		holder.timestamp.setText(mValues.get(position).getTimestamp());
+
+		holder.timestamp.startAnimation(inAnimation);
 
 		holder.view.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -56,7 +64,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 	public class ViewHolder extends RecyclerView.ViewHolder {
 		public final View view;
 		public final TextView title;
-		public final TextView body;
+		public final TextView udate;
+		public final TextView timestamp;
 
 		public Item mItem;
 
@@ -64,12 +73,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 			super(view);
 			this.view = view;
 			title = (TextView) view.findViewById(R.id.title);
-			body = (TextView) view.findViewById(R.id.body);
+			udate = (TextView) view.findViewById(R.id.udate);
+			timestamp = (TextView) view.findViewById(R.id.timestamp);
 		}
 
 		@Override
 		public String toString() {
-			return super.toString() + " '" + body.getText() + "'";
+			return super.toString() + " '" + udate.getText() + "'";
 		}
 	}
 }

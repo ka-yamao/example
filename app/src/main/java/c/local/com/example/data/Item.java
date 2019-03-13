@@ -6,9 +6,13 @@ public class Item {
 
 	private String title;
 
+	private String udate;
+
 	private String body;
 
 	private User user;
+
+	private String timestamp;
 
 	public String getId() {
 		return id;
@@ -26,6 +30,14 @@ public class Item {
 		this.title = title;
 	}
 
+	public String getUdate() {
+		return udate;
+	}
+
+	public void setUdate(String udate) {
+		this.udate = udate;
+	}
+
 	public String getBody() {
 		return body;
 	}
@@ -40,5 +52,14 @@ public class Item {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
 	}
 }
