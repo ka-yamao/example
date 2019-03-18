@@ -13,7 +13,7 @@ public class HttpAsync extends AsyncTask<String, Void, String> {
 	protected String doInBackground(String... params) {
 		String result = null;
 		try {
-			result = HttpConnection.getQiita();
+			result = HttpConnection.getItem();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

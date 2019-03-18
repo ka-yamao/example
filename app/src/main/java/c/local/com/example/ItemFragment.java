@@ -37,7 +37,7 @@ public class ItemFragment extends Fragment {
 
 	private OnListFragmentInteractionListener mListener;
 	private ItemAdapter adapter;
-	private List<Item> items = new ArrayList<>();
+	private List<Item> itemList = new ArrayList<>();
 	private HttpAsync task;
 	private Disposable disposable;
 	private Button asyncTaskButton;
@@ -94,12 +94,13 @@ public class ItemFragment extends Fragment {
 				handler.removeCallbacks(polling);
 			}
 
-			disposable = getList()
+			disposable = getItem()
 					.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
+					.flatMap(items -> getUpdate(items))
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
-					.subscribe(json -> {
-								render(json);
+					.subscribe(items -> {
+								render(items);
 								Log.d("★", "next");
 							}, error -> Log.d("★", "error")
 							, () -> Log.d("★", "complete")
@@ -122,7 +123,7 @@ public class ItemFragment extends Fragment {
 			}
 
 		});
-		adapter = new ItemAdapter(getContext(), items, mListener);
+		adapter = new ItemAdapter(getContext(), itemList, mListener);
 
 	}
 
@@ -132,13 +133,12 @@ public class ItemFragment extends Fragment {
 	 *
 	 * @return Observable<String>
 	 */
-	private Observable<String> getList() {
+	private Observable<List<Item>> getItem() {
 
 		return Observable.create(subscriber -> {
 			// Qiitaの新着10件を取得する
-			String json = HttpConnection.getQiita();
-			subscriber.onNext(json);
-
+			String json = HttpConnection.getItem();
+			subscriber.onNext(parseJson(json));
 			// タイムスタンプの最後が7だったらポーリングを止める
 			String ms = String.valueOf(System.currentTimeMillis());
 			Log.d("★", ms);
@@ -146,6 +146,33 @@ public class ItemFragment extends Fragment {
 				subscriber.onComplete();
 			}
 		});
+	}
+
+	private Observable<List<Item>> getUpdate(List<Item> items) {
+
+
+		return Observable.create(subscriber -> {
+			// Calendarクラスのオブジェクトを生成する
+			Calendar cl = Calendar.getInstance();
+			// SimpleDateFormatクラスでフォーマットパターンを設定する
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd 'at' HH:mm:ss");
+
+			String timestamp = sdf.format(cl.getTime());
+
+			Observable.fromIterable(items)
+					.map(item -> {
+						item.setTimestamp(timestamp);
+						return item;
+					})
+					.toList()
+					.subscribe(s -> {
+						subscriber.onNext(s);
+						subscriber.onComplete();
+					});
+
+		});
+
+
 	}
 
 	@Override
@@ -203,17 +230,18 @@ public class ItemFragment extends Fragment {
 			public void onSuccess(String json) {
 
 				// リストをクリアして、追加
-				render(json);
+				render(parseJson(json));
 
 			}
 		};
 	}
 
-	private void render(String json) {
+	private void render(List<Item> items) {
+
 
 		// リストをクリアして、追加
-		items.clear();
-		items.addAll(parseJson(json));
+		itemList.clear();
+		itemList.addAll(items);
 		// 通知
 		adapter.notifyDataSetChanged();
 
@@ -227,12 +255,7 @@ public class ItemFragment extends Fragment {
 
 		List<Item> items = new ArrayList<>();
 
-		// Calendarクラスのオブジェクトを生成する
-		Calendar cl = Calendar.getInstance();
 
-		// SimpleDateFormatクラスでフォーマットパターンを設定する
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd 'at' HH:mm:ss");
-		String timestamp = sdf.format(cl.getTime());
 		try {
 			if (json != null) {
 				JSONArray jsonArray = new JSONArray(json);
@@ -244,7 +267,6 @@ public class ItemFragment extends Fragment {
 					item.setTitle(jsonObject.getString("title"));
 					item.setUdate(jsonObject.getString("updated_at").substring(0, 10));
 					item.setBody(jsonObject.getString("rendered_body"));
-					item.setTimestamp(timestamp);
 					JSONObject userObject = jsonObject.getJSONObject("user");
 					// ユーザ
 					User user = new User();

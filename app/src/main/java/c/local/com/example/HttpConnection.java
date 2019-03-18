@@ -9,11 +9,20 @@ import java.net.URL;
 
 public class HttpConnection {
 
-
-	public static String getQiita() throws IOException {
-
+	public static String getItem() throws IOException {
 		// 使用するサーバーのURLに合わせる
-		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=10";
+		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=10&query=rxjava";
+		return getHttp(urlSt);
+
+	}
+
+	public static String getStock(String userId) throws IOException {
+		// 使用するサーバーのURLに合わせる
+		String urlSt = "https://qiita.com /api/v2/users/" + userId + "/stocks";
+		return getHttp(urlSt);
+	}
+
+	public static String getHttp(String urlSt) throws IOException {
 
 		HttpURLConnection httpConn = null;
 		StringBuffer result = new StringBuffer();
