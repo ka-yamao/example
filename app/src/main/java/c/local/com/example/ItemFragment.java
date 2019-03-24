@@ -94,17 +94,21 @@ public class ItemFragment extends Fragment {
 				handler.removeCallbacks(polling);
 			}
 
+
 			disposable = getItem()
 					.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
-					.flatMap(items -> getUpdate(items))
+					.concatMap(items -> getUpdate(items))
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe(items -> {
-								render(items);
-								Log.d("★", "next");
-							}, error -> Log.d("★", "error")
-							, () -> Log.d("★", "complete")
-					);
+						render(items);
+						Log.d("★", "next");
+					}, error -> {
+						Log.d("★", "error");
+					}, () -> {
+						Log.d("★", "complete");
+					});
+
 		});
 
 
@@ -139,12 +143,7 @@ public class ItemFragment extends Fragment {
 			// Qiitaの新着10件を取得する
 			String json = HttpConnection.getItem();
 			subscriber.onNext(parseJson(json));
-			// タイムスタンプの最後が7だったらポーリングを止める
-			String ms = String.valueOf(System.currentTimeMillis());
-			Log.d("★", ms);
-			if (ms.lastIndexOf("7") != 12) {
-				subscriber.onComplete();
-			}
+			subscriber.onComplete();
 		});
 	}
 
@@ -159,16 +158,16 @@ public class ItemFragment extends Fragment {
 
 			String timestamp = sdf.format(cl.getTime());
 
-			Observable.fromIterable(items)
+			List<Item> list = Observable.fromIterable(items)
 					.map(item -> {
 						item.setTimestamp(timestamp);
 						return item;
 					})
 					.toList()
-					.subscribe(s -> {
-						subscriber.onNext(s);
-						subscriber.onComplete();
-					});
+					.blockingGet();
+
+			subscriber.onNext(list);
+			subscriber.onComplete();
 
 		});
 

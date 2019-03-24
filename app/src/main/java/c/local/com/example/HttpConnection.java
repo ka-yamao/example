@@ -1,5 +1,7 @@
 package c.local.com.example;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,8 @@ public class HttpConnection {
 
 		// URL設定
 		URL url = new URL(urlSt);
+
+		Log.d("url:", url.toString());
 
 		// HttpURLConnection
 		httpConn = (HttpURLConnection) url.openConnection();
