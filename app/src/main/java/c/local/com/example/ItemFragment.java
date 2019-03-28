@@ -95,14 +95,35 @@ public class ItemFragment extends Fragment {
 			}
 
 
-			disposable = getItem()
-					.repeatWhen(observable -> observable.delay(10, TimeUnit.SECONDS))
-					.concatMap(items -> getUpdate(items))
+			disposable = Observable.timer(1, TimeUnit.SECONDS)
+					.concatMap(o -> {
+						Log.d("★", "getItem");
+						return getItem();
+					})
+					.concatMap(items -> {
+						Log.d("★", "getUpdate");
+						return getUpdate(items);
+					})
+					.repeatWhen(observable -> {
+						Log.d("★", "repeatWhen");
+						return Observable.empty();
+					})
+//					.repeatWhen(observable -> {
+//						Log.d("★", "repeatWhen");
+//						return observable.delay(10, TimeUnit.SECONDS)
+//								.take(10)
+//								.doOnNext(data -> {
+//									Log.d("★", "repeatWhen doOnNext");
+//								})
+//								.doOnComplete(() -> {
+//									Log.d("★", "repeatWhen doOnComplete");
+//								});
+//					})
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe(items -> {
-						render(items);
 						Log.d("★", "next");
+						render(items);
 					}, error -> {
 						Log.d("★", "error");
 					}, () -> {
@@ -149,7 +170,6 @@ public class ItemFragment extends Fragment {
 
 	private Observable<List<Item>> getUpdate(List<Item> items) {
 
-
 		return Observable.create(subscriber -> {
 			// Calendarクラスのオブジェクトを生成する
 			Calendar cl = Calendar.getInstance();
@@ -168,6 +188,7 @@ public class ItemFragment extends Fragment {
 
 			subscriber.onNext(list);
 			subscriber.onComplete();
+			// subscriber.onError(new Exception());
 
 		});
 
