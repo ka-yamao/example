@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import c.local.com.example.data.Item;
 import c.local.com.example.data.User;
@@ -93,45 +94,10 @@ public class ItemFragment extends Fragment {
 			if (handler != null && polling != null) {
 				handler.removeCallbacks(polling);
 			}
-
-
-			disposable = Observable.timer(1, TimeUnit.SECONDS)
-					.concatMap(o -> {
-						Log.d("★", "getItem");
-						return getItem();
-					})
-					.concatMap(items -> {
-						Log.d("★", "getUpdate");
-						return getUpdate(items);
-					})
-					.repeatWhen(observable -> {
-						Log.d("★", "repeatWhen");
-						return Observable.empty();
-					})
-//					.repeatWhen(observable -> {
-//						Log.d("★", "repeatWhen");
-//						return observable.delay(10, TimeUnit.SECONDS)
-//								.take(10)
-//								.doOnNext(data -> {
-//									Log.d("★", "repeatWhen doOnNext");
-//								})
-//								.doOnComplete(() -> {
-//									Log.d("★", "repeatWhen doOnComplete");
-//								});
-//					})
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread())
-					.subscribe(items -> {
-						Log.d("★", "next");
-						render(items);
-					}, error -> {
-						Log.d("★", "error");
-					}, () -> {
-						Log.d("★", "complete");
-					});
+			// ポーリングスタート
+			startObservable();
 
 		});
-
 
 		// RxJavaでポーリングもどき
 		stopButton.setOnClickListener(v -> {
@@ -150,8 +116,57 @@ public class ItemFragment extends Fragment {
 		});
 		adapter = new ItemAdapter(getContext(), itemList, mListener);
 
+		// ポーリングスタート
+		startObservable();
+
 	}
 
+
+	private void startObservable() {
+
+		AtomicBoolean isFinish = new AtomicBoolean(false);
+
+		disposable = Observable.timer(1, TimeUnit.SECONDS)
+				.concatMap(o -> {
+					Log.d("★", "getItem");
+					return getItem();
+				})
+				.concatMap(items -> {
+					Log.d("★", "getUpdate");
+					return getUpdate(items);
+				})
+//				.repeatWhen(observable -> {
+//					Log.d("★", "repeatWhen");
+//					return Observable.empty();
+//				})
+				.repeatWhen(observable -> {
+					Log.d("★", "repeatWhen");
+					return observable.delay(10, TimeUnit.SECONDS)
+							.takeWhile(v -> {
+								Log.d("★", "takeWhile " + isFinish.get());
+								return !isFinish.get();
+							})
+							.doOnNext(data -> {
+								Log.d("★", "repeatWhen doOnNext");
+							})
+							.doOnComplete(() -> {
+								Log.d("★", "repeatWhen doOnComplete");
+							});
+				})
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(items -> {
+					isFinish.set(true);
+					Log.d("★", "next");
+					render(items);
+				}, error -> {
+					Log.d("★", "error");
+				}, () -> {
+					Log.d("★", "complete");
+				});
+
+
+	}
 
 	/**
 	 * APIで一覧を取得
@@ -208,6 +223,8 @@ public class ItemFragment extends Fragment {
 			recyclerView.addItemDecoration(dividerItemDecoration);
 			// Adapterを設定
 			recyclerView.setAdapter(adapter);
+
+
 		}
 		return view;
 	}
@@ -242,6 +259,7 @@ public class ItemFragment extends Fragment {
 
 	public interface OnListFragmentInteractionListener {
 		void onListFragmentInteraction(Item item);
+
 	}
 
 	private HttpAsync.Listener createListener() {

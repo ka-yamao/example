@@ -20,12 +20,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 	private final List<Item> mValues;
 	private final OnListFragmentInteractionListener mListener;
 	private Animation inAnimation;
-	private Animation outAnimation;
 
 	public ItemAdapter(Context context, List<Item> items, OnListFragmentInteractionListener listener) {
 		mValues = items;
 		mListener = listener;
-		inAnimation = (Animation) AnimationUtils.loadAnimation(context, R.anim.animation);
+		inAnimation = AnimationUtils.loadAnimation(context, R.anim.animation);
 	}
 
 	@Override
