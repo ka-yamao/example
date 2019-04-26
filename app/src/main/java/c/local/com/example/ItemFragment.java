@@ -18,6 +18,7 @@ import android.widget.Button;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.reactivestreams.Subscription;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,11 +31,14 @@ import c.local.com.example.data.User;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 
 public class ItemFragment extends Fragment {
 
+	private static final String TAG = "★";
 	private OnListFragmentInteractionListener mListener;
 	private ItemAdapter adapter;
 	private List<Item> itemList = new ArrayList<>();
@@ -42,9 +46,24 @@ public class ItemFragment extends Fragment {
 	private Disposable disposable;
 	private Button asyncTaskButton;
 	private Button rxJavaButton;
+	private Button subjectButton;
 	private Button stopButton;
 	private Handler handler = new Handler();
 	private Runnable polling;
+
+	public PublishSubject<Integer> publishSubject = PublishSubject.create();
+	private Observable<List<Item>> itemObservable;
+	PublishProcessor<Integer> publishProcessor = PublishProcessor.create();
+	private Subscription subscription;
+
+	public Observable<String> hoge() {
+		return Observable.create(subscriber -> {
+
+			subscriber.onNext("str");
+			subscriber.onComplete();
+		});
+	}
+
 
 	public ItemFragment() {
 	}
@@ -57,6 +76,7 @@ public class ItemFragment extends Fragment {
 		Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
 		asyncTaskButton = toolbar.findViewById(R.id.asyncTask);
 		rxJavaButton = toolbar.findViewById(R.id.rxJava);
+		subjectButton = toolbar.findViewById(R.id.subject);
 		stopButton = toolbar.findViewById(R.id.stop);
 
 
@@ -97,55 +117,123 @@ public class ItemFragment extends Fragment {
 
 			disposable = Observable.timer(1, TimeUnit.SECONDS)
 					.concatMap(o -> {
-						Log.d("★", "getItem");
-						return getItem();
+						Log.d(TAG, " 1: getItem");
+						return getItem(5);
 					})
 					.concatMap(items -> {
-						Log.d("★", "getUpdate");
+						Log.d(TAG, " 2: getUpdate");
 						return getUpdate(items);
 					})
-					.repeatWhen(observable -> {
-						Log.d("★", "repeatWhen");
-						return Observable.empty();
+					.concatMap(items -> {
+						Log.d(TAG, " 3: getUpdate");
+						return getUpdate(items);
 					})
 //					.repeatWhen(observable -> {
 //						Log.d("★", "repeatWhen");
-//						return observable.delay(10, TimeUnit.SECONDS)
-//								.take(10)
-//								.doOnNext(data -> {
-//									Log.d("★", "repeatWhen doOnNext");
-//								})
-//								.doOnComplete(() -> {
-//									Log.d("★", "repeatWhen doOnComplete");
-//								});
+//						return Observable.empty();
 //					})
+					.repeatWhen(observable -> {
+						Log.d(TAG, "repeatWhen");
+						return observable.delay(3, TimeUnit.SECONDS)
+								.take(3)
+								.doOnNext(data -> {
+									Log.d(TAG, "repeatWhen doOnNext");
+								})
+								.doOnComplete(() -> {
+									Log.d(TAG, "repeatWhen doOnComplete");
+								});
+					})
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe(items -> {
-						Log.d("★", "next");
+						Log.d(TAG, " 4: next");
 						render(items);
 					}, error -> {
-						Log.d("★", "error");
+						Log.d(TAG, "error");
 					}, () -> {
-						Log.d("★", "complete");
+						Log.d(TAG, "complete");
 					});
 
 		});
 
+		// サブジェクト
+		subjectButton.setOnClickListener(v -> {
 
-		// RxJavaでポーリングもどき
+			// PublishProcessor連続で実行してみる
+			publishProcessor.onNext(1);
+			publishProcessor.onNext(2);
+			publishProcessor.onNext(3);
+			publishProcessor.onNext(4);
+			publishProcessor.onNext(5);
+
+
+			// PublishProcessor連続で実行してみる
+
+//			publishSubject.onNext(1);
+//			publishSubject.onNext(2);
+//			publishSubject.onNext(3);
+//			publishSubject.onNext(4);
+//			publishSubject.onNext(5);
+
+		});
+
+
+		// サブジェクトの実装 publishSubjectをonNextされたら、
+		itemObservable = publishSubject
+				// .throttleLast(3, TimeUnit.SECONDS)
+				.flatMap(i -> {
+					Log.d(TAG, String.valueOf(i));
+					return getItemSync(i);
+				}, 1)
+				.replay(1)
+				.refCount();
+
+		itemObservable
+				.subscribe(item -> {
+					render(item);
+					this.subscription.request(1);
+				}, e -> {
+					Log.d("★", "error" + e);
+				});
+
+
+		publishProcessor
+				.onBackpressureLatest()
+				.subscribe(i -> {
+					Log.d(TAG, "PublishProcessor onNext " + i);
+					publishSubject.onNext(3);
+				}, e -> {
+					Log.d(TAG, "PublishProcessor onError");
+				}, () -> {
+					Log.d(TAG, "PublishProcessor onComplete");
+				}, s -> {
+					this.subscription = s;
+					this.subscription.request(1);
+					Log.d(TAG, "PublishProcessor onSubscribe");
+				});
+
+
+		// 全て停止する
 		stopButton.setOnClickListener(v -> {
 
 			asyncTaskButton.setActivated(false);
 			rxJavaButton.setActivated(false);
 
+			// Observableのポーリンングを停止
 			if (disposable != null) {
 				disposable.dispose();
 			}
 
+			// Handlerのポーリンングを停止
 			if (handler != null && polling != null) {
 				handler.removeCallbacks(polling);
 			}
+
+			// Subscriptionを初期値に戻す
+			if (this.subscription != null) {
+				this.subscription.request(1);
+			}
+
 
 		});
 		adapter = new ItemAdapter(getContext(), itemList, mListener);
@@ -154,17 +242,39 @@ public class ItemFragment extends Fragment {
 
 
 	/**
-	 * APIで一覧を取得
+	 * APIで一覧を取得（同期）
 	 *
 	 * @return Observable<String>
 	 */
-	private Observable<List<Item>> getItem() {
+	private Observable<List<Item>> getItem(int count) {
 
 		return Observable.create(subscriber -> {
 			// Qiitaの新着10件を取得する
-			String json = HttpConnection.getItem();
+			String json = HttpConnection.getItem(count);
 			subscriber.onNext(parseJson(json));
 			subscriber.onComplete();
+		});
+	}
+
+
+	/**
+	 * APIで一覧を取得（非同期）
+	 *
+	 * @param count 取得件数
+	 * @return
+	 */
+	private Observable<List<Item>> getItemSync(int count) {
+
+		return Observable.create(subscriber -> {
+
+			task = new HttpAsync();
+			task.setCount(count);
+			task.setListener(result -> {
+				subscriber.onNext(parseJson(result));
+				subscriber.onComplete();
+			});
+			task.execute();
+
 		});
 	}
 

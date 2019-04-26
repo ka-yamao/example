@@ -7,13 +7,14 @@ import java.io.IOException;
 public class HttpAsync extends AsyncTask<String, Void, String> {
 
 	private Listener listener;
+	private int count;
 
 	// 非同期処理
 	@Override
 	protected String doInBackground(String... params) {
 		String result = null;
 		try {
-			result = HttpConnection.getItem();
+			result = HttpConnection.getItem(count);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -28,6 +29,10 @@ public class HttpAsync extends AsyncTask<String, Void, String> {
 		if (listener != null) {
 			listener.onSuccess(result);
 		}
+	}
+
+	void setCount(int count) {
+		this.count = count;
 	}
 
 	void setListener(Listener listener) {

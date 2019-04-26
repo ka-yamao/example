@@ -30,6 +30,7 @@
 				android:textColor="@android:color/white"
 				android:text="@string/app_name"/>
 
+
 			<Button
 				android:id="@+id/asyncTask"
 				android:layout_width="0dp"
@@ -53,6 +54,18 @@
 				android:background="@drawable/button2"
 				android:textAllCaps="false"
 				android:text="RxJava"/>
+
+			<Button
+				android:id="@+id/subject"
+				android:layout_width="0dp"
+				android:layout_height="30dp"
+				android:layout_weight="1"
+				android:layout_marginRight="5dp"
+				android:textColor="@android:color/white"
+				android:textStyle="bold"
+				android:background="@drawable/button3"
+				android:textAllCaps="false"
+				android:text="Subject"/>
 
 			<Button
 				android:id="@+id/stop"

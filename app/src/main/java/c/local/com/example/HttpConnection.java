@@ -11,9 +11,9 @@ import java.net.URL;
 
 public class HttpConnection {
 
-	public static String getItem() throws IOException {
+	public static String getItem(int count) throws IOException {
 		// 使用するサーバーのURLに合わせる
-		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=10&query=rxjava";
+		String urlSt = "https://qiita.com/api/v2/items?page=1&per_page=" + count + "&query=rxjava";
 		return getHttp(urlSt);
 
 	}
