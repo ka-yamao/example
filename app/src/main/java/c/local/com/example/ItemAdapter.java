@@ -39,7 +39,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 		holder.mItem = mValues.get(position);
 		holder.title.setText(mValues.get(position).getTitle());
 		holder.udate.setText(mValues.get(position).getUdate());
-		holder.timestamp.setText(mValues.get(position).getTimestamp());
+		holder.timestamp.setText(mValues.get(position).getCount() + "      " + mValues.get(position).getTimestamp());
 
 		holder.timestamp.startAnimation(inAnimation);
 
@@ -71,9 +71,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 		public ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			title = (TextView) view.findViewById(R.id.title);
-			udate = (TextView) view.findViewById(R.id.udate);
-			timestamp = (TextView) view.findViewById(R.id.timestamp);
+			title = view.findViewById(R.id.title);
+			udate = view.findViewById(R.id.udate);
+			timestamp = view.findViewById(R.id.timestamp);
 		}
 
 		@Override

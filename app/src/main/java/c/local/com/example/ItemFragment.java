@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import c.local.com.example.data.Item;
 import c.local.com.example.data.User;
@@ -114,6 +115,7 @@ public class ItemFragment extends Fragment {
 				handler.removeCallbacks(polling);
 			}
 
+			AtomicInteger pollingCount = new AtomicInteger();
 
 			disposable = Observable.timer(1, TimeUnit.SECONDS)
 					.concatMap(o -> {
@@ -124,18 +126,26 @@ public class ItemFragment extends Fragment {
 						Log.d(TAG, " 2: getUpdate");
 						return getUpdate(items);
 					})
-					.concatMap(items -> {
-						Log.d(TAG, " 3: getUpdate");
-						return getUpdate(items);
+					.scan(new ArrayList<Item>(), (preItem, item) -> {
+						Log.d(TAG, " 3: scan");
+						pollingCount.getAndIncrement();
+
+						item = Observable.fromIterable(item)
+								.map(i -> {
+									i.setCount(pollingCount.get());
+									return i;
+								})
+								.toList()
+								.blockingGet();
+
+						preItem.clear();
+						preItem.addAll(item);
+						return (ArrayList<Item>) item;
 					})
-//					.repeatWhen(observable -> {
-//						Log.d("★", "repeatWhen");
-//						return Observable.empty();
-//					})
 					.repeatWhen(observable -> {
 						Log.d(TAG, "repeatWhen");
-						return observable.delay(3, TimeUnit.SECONDS)
-								.take(3)
+						return observable.delay(5, TimeUnit.SECONDS)
+								.take(5)
 								.doOnNext(data -> {
 									Log.d(TAG, "repeatWhen doOnNext");
 								})
@@ -146,12 +156,20 @@ public class ItemFragment extends Fragment {
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe(items -> {
-						Log.d(TAG, " 4: next");
+						Log.d(TAG, "next");
 						render(items);
 					}, error -> {
 						Log.d(TAG, "error");
 					}, () -> {
 						Log.d(TAG, "complete");
+
+						rxJavaButton.setActivated(false);
+
+						// Observableのポーリンングを停止
+						if (disposable != null) {
+							disposable.dispose();
+						}
+
 					});
 
 		});

@@ -14,6 +14,10 @@ public class Item {
 
 	private String timestamp;
 
+	private String lastTime;
+
+	private int count;
+
 	public String getId() {
 		return id;
 	}
@@ -62,4 +66,21 @@ public class Item {
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	public String getLastTime() {
+		return lastTime;
+	}
+
+	public void setLastTime(String lastTime) {
+		this.lastTime = lastTime;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
 }
