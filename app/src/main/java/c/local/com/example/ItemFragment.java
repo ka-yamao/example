@@ -51,19 +51,11 @@ public class ItemFragment extends Fragment {
 	private Button stopButton;
 	private Handler handler = new Handler();
 	private Runnable polling;
-
 	public PublishSubject<Integer> publishSubject = PublishSubject.create();
 	private Observable<List<Item>> itemObservable;
 	PublishProcessor<Integer> publishProcessor = PublishProcessor.create();
 	private Subscription subscription;
-
-	public Observable<String> hoge() {
-		return Observable.create(subscriber -> {
-
-			subscriber.onNext("str");
-			subscriber.onComplete();
-		});
-	}
+	private AtomicInteger pollingCount = new AtomicInteger();
 
 
 	public ItemFragment() {
@@ -81,15 +73,11 @@ public class ItemFragment extends Fragment {
 		stopButton = toolbar.findViewById(R.id.stop);
 
 
-		// AsyncTaskでポーリングもどき
+		// AsyncTaskでポーリング
 		asyncTaskButton.setOnClickListener(v -> {
-
 			v.setActivated(true);
-
-			if (disposable != null) {
-				disposable.dispose();
-			}
-
+			// 全て停止
+			initPolling();
 			polling = new Runnable() {
 				@Override
 				public void run() {
@@ -97,25 +85,18 @@ public class ItemFragment extends Fragment {
 					task = new HttpAsync();
 					task.setListener(createListener());
 					task.execute();
-					handler.postDelayed(this, 10000);
+					handler.postDelayed(this, 5000);
 				}
 			};
 
 			handler.postDelayed(polling, 3000);
 
-
 		});
 
-		// RxJavaでポーリングもどき
+		// RxJavaでポーリング
 		rxJavaButton.setOnClickListener(v -> {
-
 			v.setActivated(true);
-
-			if (handler != null && polling != null) {
-				handler.removeCallbacks(polling);
-			}
-
-			AtomicInteger pollingCount = new AtomicInteger();
+			initPolling();
 
 			disposable = Observable.timer(1, TimeUnit.SECONDS)
 					.concatMap(o -> {
@@ -125,22 +106,6 @@ public class ItemFragment extends Fragment {
 					.concatMap(items -> {
 						Log.d(TAG, " 2: getUpdate");
 						return getUpdate(items);
-					})
-					.scan(new ArrayList<Item>(), (preItem, item) -> {
-						Log.d(TAG, " 3: scan");
-						pollingCount.getAndIncrement();
-
-						item = Observable.fromIterable(item)
-								.map(i -> {
-									i.setCount(pollingCount.get());
-									return i;
-								})
-								.toList()
-								.blockingGet();
-
-						preItem.clear();
-						preItem.addAll(item);
-						return (ArrayList<Item>) item;
 					})
 					.repeatWhen(observable -> {
 						Log.d(TAG, "repeatWhen");
@@ -184,15 +149,6 @@ public class ItemFragment extends Fragment {
 			publishProcessor.onNext(4);
 			publishProcessor.onNext(5);
 
-
-			// PublishProcessor連続で実行してみる
-
-//			publishSubject.onNext(1);
-//			publishSubject.onNext(2);
-//			publishSubject.onNext(3);
-//			publishSubject.onNext(4);
-//			publishSubject.onNext(5);
-
 		});
 
 
@@ -233,28 +189,33 @@ public class ItemFragment extends Fragment {
 
 		// 全て停止する
 		stopButton.setOnClickListener(v -> {
-
-			asyncTaskButton.setActivated(false);
-			rxJavaButton.setActivated(false);
-
-			// Observableのポーリンングを停止
-			if (disposable != null) {
-				disposable.dispose();
-			}
-
-			// Handlerのポーリンングを停止
-			if (handler != null && polling != null) {
-				handler.removeCallbacks(polling);
-			}
-
-			// Subscriptionを初期値に戻す
-			if (this.subscription != null) {
-				this.subscription.request(1);
-			}
-
-
+			initPolling();
 		});
+
 		adapter = new ItemAdapter(getContext(), itemList, mListener);
+
+	}
+
+	public void initPolling() {
+
+		asyncTaskButton.setActivated(false);
+		rxJavaButton.setActivated(false);
+		subjectButton.setActivated(false);
+
+		// Observableのポーリンングを停止
+		if (disposable != null) {
+			disposable.dispose();
+		}
+		// Handlerのポーリンングを停止
+		if (handler != null && polling != null) {
+			handler.removeCallbacks(polling);
+		}
+		// Subscriptionを初期値に戻す
+		if (this.subscription != null) {
+			this.subscription.request(1);
+		}
+		// ポーリングカウントを0
+		pollingCount.set(0);
 
 	}
 
@@ -299,6 +260,9 @@ public class ItemFragment extends Fragment {
 	private Observable<List<Item>> getUpdate(List<Item> items) {
 
 		return Observable.create(subscriber -> {
+
+			// ポーリングカウントをインクリメント
+			final int count = pollingCount.incrementAndGet();
 			// Calendarクラスのオブジェクトを生成する
 			Calendar cl = Calendar.getInstance();
 			// SimpleDateFormatクラスでフォーマットパターンを設定する
@@ -309,6 +273,7 @@ public class ItemFragment extends Fragment {
 			List<Item> list = Observable.fromIterable(items)
 					.map(item -> {
 						item.setTimestamp(timestamp);
+						item.setCount(count);
 						return item;
 					})
 					.toList()
@@ -316,7 +281,6 @@ public class ItemFragment extends Fragment {
 
 			subscriber.onNext(list);
 			subscriber.onComplete();
-			// subscriber.onError(new Exception());
 
 		});
 
@@ -373,14 +337,13 @@ public class ItemFragment extends Fragment {
 	}
 
 	private HttpAsync.Listener createListener() {
-		return new HttpAsync.Listener() {
-			@Override
-			public void onSuccess(String json) {
+		return json -> {
 
-				// リストをクリアして、追加
-				render(parseJson(json));
+			// JSONをパース
+			List<Item> item = parseJson(json);
+			// 更新日を更新
+			getUpdate(item).subscribe(i -> render(i));
 
-			}
 		};
 	}
 

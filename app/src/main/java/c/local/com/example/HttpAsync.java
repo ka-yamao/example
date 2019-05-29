@@ -7,7 +7,7 @@ import java.io.IOException;
 public class HttpAsync extends AsyncTask<String, Void, String> {
 
 	private Listener listener;
-	private int count;
+	private int count = 5;
 
 	// 非同期処理
 	@Override
