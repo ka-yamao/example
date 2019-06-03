@@ -139,7 +139,7 @@ public class ItemFragment extends Fragment {
 
 		});
 
-		// サブジェクト
+		// Subjectボタン
 		subjectButton.setOnClickListener(v -> {
 
 			// PublishProcessor連続で実行してみる
@@ -159,6 +159,10 @@ public class ItemFragment extends Fragment {
 					Log.d(TAG, String.valueOf(i));
 					return getItemSync(i);
 				}, 1)
+				.flatMap(items -> {
+					Log.d(TAG, items.toString());
+					return getUpdate(items);
+				}, 1)
 				.replay(1)
 				.refCount();
 
@@ -175,7 +179,7 @@ public class ItemFragment extends Fragment {
 				.onBackpressureLatest()
 				.subscribe(i -> {
 					Log.d(TAG, "PublishProcessor onNext " + i);
-					publishSubject.onNext(3);
+					publishSubject.onNext(i);
 				}, e -> {
 					Log.d(TAG, "PublishProcessor onError");
 				}, () -> {
