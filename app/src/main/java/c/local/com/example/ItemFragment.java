@@ -141,6 +141,7 @@ public class ItemFragment extends Fragment {
 
 		// Subjectボタン
 		subjectButton.setOnClickListener(v -> {
+			subjectButton.setActivated(true);
 
 			// PublishProcessor連続で実行してみる
 			publishProcessor.onNext(1);
@@ -170,6 +171,7 @@ public class ItemFragment extends Fragment {
 				.subscribe(item -> {
 					render(item);
 					this.subscription.request(1);
+					subjectButton.setActivated(false);
 				}, e -> {
 					Log.d("★", "error" + e);
 				});
@@ -200,6 +202,9 @@ public class ItemFragment extends Fragment {
 
 	}
 
+	/**
+	 * 各非同期処理の初期化
+	 */
 	public void initPolling() {
 
 		asyncTaskButton.setActivated(false);
