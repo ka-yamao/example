@@ -1,6 +1,6 @@
 # example
 
-## RxJava のサンプル
+## RxJava のサンプル (ポーリング)
 
 - https://github.com/ka-yamao/example/tree/2763
 
