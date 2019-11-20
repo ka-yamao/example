@@ -48,6 +48,7 @@ public class ItemFragment extends Fragment {
 	private Button asyncTaskButton;
 	private Button rxJavaButton;
 	private Button subjectButton;
+	private Button combineButton;
 	private Button stopButton;
 	private Handler handler = new Handler();
 	private Runnable polling;
@@ -70,6 +71,7 @@ public class ItemFragment extends Fragment {
 		asyncTaskButton = toolbar.findViewById(R.id.asyncTask);
 		rxJavaButton = toolbar.findViewById(R.id.rxJava);
 		subjectButton = toolbar.findViewById(R.id.subject);
+		combineButton = toolbar.findViewById(R.id.combine);
 		stopButton = toolbar.findViewById(R.id.stop);
 
 
@@ -149,6 +151,31 @@ public class ItemFragment extends Fragment {
 			publishProcessor.onNext(3);
 			publishProcessor.onNext(4);
 			publishProcessor.onNext(5);
+
+		});
+
+		// Combineボタン
+		combineButton.setOnClickListener(v -> {
+
+			Observable.combineLatest(getItem(1), getItem(2), (items1, items2) -> {
+				// item1の1件にitem2の2件をマージする
+				items1.addAll(items2);
+				// 3件を返す
+				return items1;
+			}).subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe(items -> {
+								// 一覧へ反映
+								render(items);
+							},
+							e -> {
+								Log.d("★", "error" + e);
+
+							}, () -> {
+								Log.d("★", "complete");
+							}
+
+					);
 
 		});
 
