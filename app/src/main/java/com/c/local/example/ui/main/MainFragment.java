@@ -1,5 +1,6 @@
 package com.c.local.example.ui.main;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +33,9 @@ public class MainFragment extends Fragment {
 
 		View view = binding.getRoot();
 		EllipsizedTextView title = view.findViewById(R.id.ellipsizedTextView3);
-		title.setEllipsis("動的に変更");
-		title.setText("ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ");
+		title.setEllipsis("・・・省略を動的に変更");
+		title.setEllipsisColor(Color.RED);
+		title.setText("Javaで動的にほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ");
 		return view;
 	}
 

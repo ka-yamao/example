@@ -21,7 +21,7 @@
 			android:text="1行 ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ"
 			android:textSize="18sp"
 			app:ellipsis="… 続きを読む"
-			app:ellipsisColor="@color/teal_200" />
+			app:ellipsisColor="@color/purple_700" />
 
 		<com.c.local.example.EllipsizedTextView
 			android:id="@+id/ellipsizedTextView2"
@@ -35,7 +35,7 @@
 			android:text="複数行 ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ"
 			android:textSize="18sp"
 			app:ellipsis="… 続きを読む"
-			app:ellipsisColor="@color/teal_200" />
+			app:ellipsisColor="@color/purple_700" />
 
 		<com.c.local.example.EllipsizedTextView
 			android:id="@+id/ellipsizedTextView3"
@@ -46,10 +46,10 @@
 			android:textColor="#000"
 			android:maxLines="1"
 			android:ellipsize="end"
-			android:text="動的に変更 ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ"
+			android:text="1行 ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ"
 			android:textSize="18sp"
 			app:ellipsis="… 続きを読む"
-			app:ellipsisColor="@color/teal_200" />
+			app:ellipsisColor="@color/purple_700" />
 	</LinearLayout>
 
 
