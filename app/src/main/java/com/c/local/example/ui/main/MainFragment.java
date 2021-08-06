@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.c.local.example.EllipsizedTextView;
+import com.c.local.example.R;
 import com.c.local.example.databinding.MainFragmentBinding;
 
 import androidx.annotation.NonNull;
@@ -13,7 +15,10 @@ import androidx.fragment.app.Fragment;
 
 public class MainFragment extends Fragment {
 
+
 	private MainFragmentBinding binding;
+	private MainViewModel mainViewModel;
+
 
 	public static MainFragment newInstance() {
 		return new MainFragment();
@@ -24,19 +29,16 @@ public class MainFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 							 @Nullable Bundle savedInstanceState) {
 		binding = MainFragmentBinding.inflate(inflater, container, false);
+
 		View view = binding.getRoot();
+		EllipsizedTextView title = view.findViewById(R.id.ellipsizedTextView3);
+		title.setEllipsis("動的に変更");
+		title.setText("ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ");
 		return view;
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		// ビュー バインディング
-		binding.setData(new Data());
-		binding.button.setOnClickListener(v -> {
-			binding.text.setText("time: " + System.currentTimeMillis());
-		});
 	}
-
 }

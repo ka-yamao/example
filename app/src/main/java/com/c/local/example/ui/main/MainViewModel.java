@@ -1,26 +1,22 @@
 package com.c.local.example.ui.main;
 
-import android.view.View;
-
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class MainViewModel extends ViewModel {
+	private MutableLiveData<Integer> count;
 	private MutableLiveData<String> text;
 
-	public void init() {
-		// text.postValue("time: init");
+	public String getText() {
+		return text.getValue();
 	}
 
-	public LiveData<String> getText() {
+	public void setText(String str) {
 		if (text == null) {
 			text = new MutableLiveData<>();
 		}
-		return text;
+		text.setValue(str);
+
 	}
 
-	public void onClick(View view) {
-		text.setValue("time: " + System.currentTimeMillis());
-	}
 }

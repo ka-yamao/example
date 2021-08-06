@@ -1,31 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<data>
-
-		<variable
-			name="data"
-			type="com.c.local.example.ui.main.Data" />
-	</data>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 
 	<LinearLayout
 		android:orientation="vertical"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:padding="20dp"
 		android:gravity="center">
 
-		<TextView
-			android:id="@+id/text"
+		<com.c.local.example.EllipsizedTextView
+			android:id="@+id/ellipsizedTextView1"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@{data.text}"
-			android:textAlignment="center" />
+			android:layout_marginVertical="20dp"
+			android:layout_weight="0.1"
+			android:textColor="#000"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:text="1行 ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ"
+			android:textSize="18sp"
+			app:ellipsis="… 続きを読む"
+			app:ellipsisColor="@color/teal_200" />
 
-		<Button
-			android:id="@+id/button"
+		<com.c.local.example.EllipsizedTextView
+			android:id="@+id/ellipsizedTextView2"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Button" />
+			android:layout_marginVertical="20dp"
+			android:layout_weight="0.1"
+			android:textColor="#000"
+			android:maxLines="2"
+			android:ellipsize="end"
+			android:text="複数行 ほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげほげ"
+			android:textSize="18sp"
+			app:ellipsis="… 続きを読む"
+			app:ellipsisColor="@color/teal_200" />
+
+		<com.c.local.example.EllipsizedTextView
+			android:id="@+id/ellipsizedTextView3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginVertical="20dp"
+			android:layout_weight="0.1"
+			android:textColor="#000"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:text="動的に変更 ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ"
+			android:textSize="18sp"
+			app:ellipsis="… 続きを読む"
+			app:ellipsisColor="@color/teal_200" />
 	</LinearLayout>
+
 
 </layout>
