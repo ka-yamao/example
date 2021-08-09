@@ -39,7 +39,7 @@ public class ProductListViewModel extends AndroidViewModel {
     private final LiveData<List<ProductEntity>> mProducts;
 
     public ProductListViewModel(@NonNull Application application,
-            @NonNull SavedStateHandle savedStateHandle) {
+                                @NonNull SavedStateHandle savedStateHandle) {
         super(application);
         mSavedStateHandler = savedStateHandle;
 

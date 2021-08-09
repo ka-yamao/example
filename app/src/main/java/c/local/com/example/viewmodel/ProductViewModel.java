@@ -39,7 +39,7 @@ public class ProductViewModel extends AndroidViewModel {
     private final LiveData<List<CommentEntity>> mObservableComments;
 
     public ProductViewModel(@NonNull Application application, DataRepository repository,
-            final int productId) {
+                            final int productId) {
         super(application);
         mProductId = productId;
 
