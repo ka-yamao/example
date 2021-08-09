@@ -4,11 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,12 +21,19 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import c.local.com.example.data.Item;
 import c.local.com.example.data.User;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+
 
 
 public class ItemFragment extends Fragment {
@@ -46,6 +48,8 @@ public class ItemFragment extends Fragment {
 	private Button stopButton;
 	private Handler handler = new Handler();
 	private Runnable polling;
+	public PublishSubject<Integer> clickObservable = PublishSubject.create();
+
 
 	public ItemFragment() {
 	}
@@ -131,8 +135,20 @@ public class ItemFragment extends Fragment {
 					Log.d("★", "getItem");
 					return getItem();
 				})
+				.scan((preItem, items) -> {
+					Log.d("★", "scan");
+					return items;
+				})
 				.concatMap(items -> {
-					Log.d("★", "getUpdate");
+					Log.d("★", "getUpdate1");
+					return getUpdate(items);
+				})
+				.concatMap(items -> {
+					Log.d("★", "getUpdate2");
+					return getUpdate(items);
+				})
+				.concatMap(items -> {
+					Log.d("★", "getUpdate3");
 					return getUpdate(items);
 				})
 //				.repeatWhen(observable -> {
