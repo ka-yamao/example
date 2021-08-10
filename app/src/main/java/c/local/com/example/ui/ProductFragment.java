@@ -32,68 +32,71 @@ import c.local.com.example.viewmodel.ProductViewModel;
 
 public class ProductFragment extends Fragment {
 
-    private static final String KEY_PRODUCT_ID = "product_id";
+	private static final String KEY_PRODUCT_ID = "product_id";
 
-    private ProductFragmentBinding mBinding;
+	private ProductFragmentBinding mBinding;
 
-    private CommentAdapter mCommentAdapter;
+	private CommentAdapter mCommentAdapter;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        // Inflate this data binding layout
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.product_fragment, container, false);
+	@Nullable
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+							 @Nullable Bundle savedInstanceState) {
+		// Inflate this data binding layout
+		mBinding = DataBindingUtil.inflate(inflater, R.layout.product_fragment, container, false);
 
-        // Create and set the adapter for the RecyclerView.
-        mCommentAdapter = new CommentAdapter(mCommentClickCallback);
-        mBinding.commentList.setAdapter(mCommentAdapter);
-        return mBinding.getRoot();
-    }
+		
+		// Create and set the adapter for the RecyclerView.
+		mCommentAdapter = new CommentAdapter(mCommentClickCallback);
+		mBinding.commentList.setAdapter(mCommentAdapter);
+		return mBinding.getRoot();
+	}
 
-    private final CommentClickCallback mCommentClickCallback = comment -> {
-        // no-op
-    };
+	private final CommentClickCallback mCommentClickCallback = comment -> {
+		// no-op
+	};
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ProductViewModel.Factory factory = new ProductViewModel.Factory(
-                requireActivity().getApplication(), requireArguments().getInt(KEY_PRODUCT_ID));
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		ProductViewModel.Factory factory = new ProductViewModel.Factory(
+				requireActivity().getApplication(), requireArguments().getInt(KEY_PRODUCT_ID));
 
-        final ProductViewModel model = new ViewModelProvider(this, factory)
-                .get(ProductViewModel.class);
+		final ProductViewModel model = new ViewModelProvider(this, factory)
+				.get(ProductViewModel.class);
 
-        mBinding.setLifecycleOwner(getViewLifecycleOwner());
-        mBinding.setProductViewModel(model);
+		mBinding.setLifecycleOwner(getViewLifecycleOwner());
+		mBinding.setProductViewModel(model);
 
-        subscribeToModel(model);
-    }
+		subscribeToModel(model);
+	}
 
-    private void subscribeToModel(final ProductViewModel model) {
-        // Observe comments
-        model.getComments().observe(getViewLifecycleOwner(), commentEntities -> {
-            if (commentEntities != null) {
-                mBinding.setIsLoading(false);
-                mCommentAdapter.submitList(commentEntities);
-            } else {
-                mBinding.setIsLoading(true);
-            }
-        });
-    }
+	private void subscribeToModel(final ProductViewModel model) {
+		// Observe comments
+		model.getComments().observe(getViewLifecycleOwner(), commentEntities -> {
+			if (commentEntities != null) {
+				mBinding.setIsLoading(false);
+				mCommentAdapter.submitList(commentEntities);
+			} else {
+				mBinding.setIsLoading(true);
+			}
+		});
+	}
 
-    @Override
-    public void onDestroyView() {
-        mBinding = null;
-        mCommentAdapter = null;
-        super.onDestroyView();
-    }
+	@Override
+	public void onDestroyView() {
+		mBinding = null;
+		mCommentAdapter = null;
+		super.onDestroyView();
+	}
 
-    /** Creates product fragment for specific product ID */
-    public static ProductFragment forProduct(int productId) {
-        ProductFragment fragment = new ProductFragment();
-        Bundle args = new Bundle();
-        args.putInt(KEY_PRODUCT_ID, productId);
-        fragment.setArguments(args);
-        return fragment;
-    }
+	/**
+	 * Creates product fragment for specific product ID
+	 */
+	public static ProductFragment forProduct(int productId) {
+		ProductFragment fragment = new ProductFragment();
+		Bundle args = new Bundle();
+		args.putInt(KEY_PRODUCT_ID, productId);
+		fragment.setArguments(args);
+		return fragment;
+	}
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2017, The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,57 +15,56 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
+	<data>
 
-        <import type="android.view.View"/>
+		<import type="android.view.View" />
 
-        <variable
-            name="isLoading"
-            type="boolean" />
+		<variable
+			name="isLoading"
+			type="boolean" />
 
-        <variable
-            name="productViewModel"
-            type="c.local.com.example.viewmodel.ProductViewModel"/>
-    </data>
+		<variable
+			name="productViewModel"
+			type="c.local.com.example.viewmodel.ProductViewModel" />
+	</data>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/cardview_light_background"
-        android:orientation="vertical">
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/cardview_light_background"
+		android:orientation="vertical">
 
-        <include
-            layout="@layout/product_item"
-            app:product="@{productViewModel.product}"/>
+		<include
+			layout="@layout/product_item"
+			app:product="@{productViewModel.product}" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+		<FrameLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/loading_comments_tv"
-                android:text="@string/loading_comments"
-                app:visibleGone="@{isLoading}"/>
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:id="@+id/loading_comments_tv"
+				android:text="@string/loading_comments" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/comments_list_wrapper">
+			<FrameLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:id="@+id/comments_list_wrapper">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/comment_list"
-                    android:contentDescription="@string/cd_comments_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layoutManager="LinearLayoutManager"
-                    app:visibleGone="@{!isLoading}"/>
-            </FrameLayout>
-        </FrameLayout>
+				<androidx.recyclerview.widget.RecyclerView
+					android:id="@+id/comment_list"
+					android:contentDescription="@string/cd_comments_list"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					app:layoutManager="LinearLayoutManager"
+					android:visibility="@{isLoading ?  View.VISIBLE : View.GONE}" />
+			</FrameLayout>
+		</FrameLayout>
 
 
-    </LinearLayout>
+	</LinearLayout>
 </layout>

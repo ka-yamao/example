@@ -8,4 +8,6 @@
 	<string name="cd_comments_list">Comments list</string>
 	<string name="cd_product_name">Name of the product</string>
 	<string name="cd_search_products">Search products</string>
+	<!-- TODO: Remove or change this placeholder text -->
+	<string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
