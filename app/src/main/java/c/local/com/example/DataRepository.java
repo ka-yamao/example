@@ -72,7 +72,7 @@ public class DataRepository {
 		List list = new ArrayList<Pokemon>();
 		list.add(new Pokemon(25, "pikachu", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"));
 
-		mObservablePokemon.postValue(list);
+		// mObservablePokemon.postValue(list);
 		return mObservablePokemon;
 	}
 }

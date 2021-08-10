@@ -32,10 +32,15 @@ public class MainActivity extends AppCompatActivity {
 
 		// Add product list fragment if this is first creation
 		if (savedInstanceState == null) {
-			ProductListFragment fragment = new ProductListFragment();
+//			ProductListFragment fragment = new ProductListFragment();
+//
+//			getSupportFragmentManager().beginTransaction()
+//					.add(R.id.fragment_container, fragment, ProductListFragment.TAG).commit();
+			PokemonListFragment fragment = new PokemonListFragment();
 
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, fragment, ProductListFragment.TAG).commit();
+					.add(R.id.fragment_container, fragment, PokemonListFragment.TAG).commit();
+
 		}
 	}
 

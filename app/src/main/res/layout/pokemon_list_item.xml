@@ -29,12 +29,12 @@
 			type="c.local.com.example.ui.PokemonClickCallback" />
 	</data>
 
-	<!--	android:onClick="@{() ->  callback.onClick(pokemon)}"-->
+
 	<androidx.cardview.widget.CardView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:minHeight="@dimen/product_item_min_height"
-
+		android:onClick="@{() ->  callback.onClick(pokemon)}"
 		android:orientation="horizontal"
 		android:layout_marginStart="@dimen/item_horizontal_margin"
 		android:layout_marginEnd="@dimen/item_horizontal_margin"

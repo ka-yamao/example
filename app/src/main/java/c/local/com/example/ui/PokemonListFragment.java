@@ -33,7 +33,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
 import c.local.com.example.data.Pokemon;
-import c.local.com.example.databinding.ListFragmentBinding;
+import c.local.com.example.databinding.PokemonListFragmentBinding;
 import c.local.com.example.viewmodel.PokemonListViewModel;
 
 public class PokemonListFragment extends Fragment {
@@ -42,7 +42,7 @@ public class PokemonListFragment extends Fragment {
 
 	private PokemonAdapter mPokemonAdapter;
 
-	private ListFragmentBinding mBinding;
+	private PokemonListFragmentBinding mBinding;
 
 	@Nullable
 	@Override
@@ -51,7 +51,7 @@ public class PokemonListFragment extends Fragment {
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.pokemon_list_fragment, container, false);
 
 		mPokemonAdapter = new PokemonAdapter(mPokemonClickCallback);
-		mBinding.productsList.setAdapter(mPokemonAdapter);
+		mBinding.pokemonList.setAdapter(mPokemonAdapter);
 
 		return mBinding.getRoot();
 	}
@@ -62,8 +62,8 @@ public class PokemonListFragment extends Fragment {
 		final PokemonListViewModel viewModel =
 				new ViewModelProvider(this).get(PokemonListViewModel.class);
 
-		mBinding.productsSearchBtn.setOnClickListener(v -> {
-			Editable query = mBinding.productsSearchBox.getText();
+		mBinding.pokemonSearchBtn.setOnClickListener(v -> {
+			Editable query = mBinding.pokemonSearchBox.getText();
 			viewModel.setQuery(query);
 		});
 
@@ -92,9 +92,9 @@ public class PokemonListFragment extends Fragment {
 		super.onDestroyView();
 	}
 
-	private final PokemonClickCallback mPokemonClickCallback = product -> {
+	private final PokemonClickCallback mPokemonClickCallback = pokemon -> {
 		if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-			((MainActivity) requireActivity()).show(product);
+			((MainActivity) requireActivity()).showPokemon(pokemon);
 		}
 	};
 }
