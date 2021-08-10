@@ -14,31 +14,11 @@
  * limitations under the License.
  */
 
-package c.local.com.example;
+package c.local.com.example.ui;
 
-import android.app.Application;
 
-import c.local.com.example.db.AppDatabase;
+import c.local.com.example.data.Pokemon;
 
-/**
- * Android Application class. Used for accessing singletons.
- */
-public class BasicApp extends Application {
-
-	private AppExecutors mAppExecutors;
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-
-		mAppExecutors = new AppExecutors();
-	}
-
-	public AppDatabase getDatabase() {
-		return AppDatabase.getInstance(this, mAppExecutors);
-	}
-
-	public DataRepository getRepository() {
-		return DataRepository.getInstance(getDatabase());
-	}
+public interface PokemonClickCallback {
+	void onClick(Pokemon pokemon);
 }

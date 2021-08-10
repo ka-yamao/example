@@ -1,10 +1,12 @@
 package c.local.com.example;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import c.local.com.example.data.Pokemon;
 import c.local.com.example.db.AppDatabase;
 import c.local.com.example.db.entity.CommentEntity;
 import c.local.com.example.db.entity.ProductEntity;
@@ -19,17 +21,22 @@ public class DataRepository {
 	private final AppDatabase mDatabase;
 	private MediatorLiveData<List<ProductEntity>> mObservableProducts;
 
+	private PokeAPIService api;
+	private MediatorLiveData<List<Pokemon>> mObservablePokemon;
+
 	private DataRepository(final AppDatabase database) {
 		mDatabase = database;
 		mObservableProducts = new MediatorLiveData<>();
-
 		mObservableProducts.addSource(mDatabase.productDao().loadAllProducts(),
 				productEntities -> {
 					if (mDatabase.getDatabaseCreated().getValue() != null) {
 						mObservableProducts.postValue(productEntities);
 					}
 				});
+
+		mObservablePokemon = new MediatorLiveData<>();
 	}
+
 
 	public static DataRepository getInstance(final AppDatabase database) {
 		if (sInstance == null) {
@@ -61,7 +68,11 @@ public class DataRepository {
 		return mDatabase.productDao().searchAllProducts(query);
 	}
 
-	public LiveData<List<ProductEntity>> search(String query) {
-		return mDatabase.productDao().searchAllProducts(query);
+	public LiveData<List<Pokemon>> getPokemon(String query) {
+		List list = new ArrayList<Pokemon>();
+		list.add(new Pokemon(25, "pikachu", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"));
+
+		mObservablePokemon.postValue(list);
+		return mObservablePokemon;
 	}
 }
