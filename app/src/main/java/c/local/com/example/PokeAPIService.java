@@ -6,5 +6,5 @@ import retrofit2.http.GET;
 public interface PokeAPIService {
 
 	@GET("pokemon")
-	Observable<PokemonResponse> getPokemons();
+	Observable<PokemonResponse2> getPokemons();
 }

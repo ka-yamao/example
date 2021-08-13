@@ -32,7 +32,7 @@ import c.local.com.example.DataRepository;
 import c.local.com.example.data.Pokemon;
 
 public class PokemonListViewModel extends AndroidViewModel {
-	private static final String QUERY_KEY = "QUERY";
+	private static final String QUERY_KEY = "Poke";
 
 	private final SavedStateHandle mSavedStateHandler;
 	private final DataRepository mRepository;
@@ -45,30 +45,24 @@ public class PokemonListViewModel extends AndroidViewModel {
 
 		mRepository = ((BasicApp) application).getRepository();
 
-		// Use the savedStateHandle.getLiveData() as the input to switchMap,
-		// allowing us to recalculate what LiveData to get from the DataRepository
-		// based on what query the user has entered
 		mPokemons = Transformations.switchMap(
 				savedStateHandle.getLiveData("QUERY", null),
 				(Function<CharSequence, LiveData<List<Pokemon>>>) query -> {
 					if (TextUtils.isEmpty(query)) {
-						return mRepository.getPokemon("25");
+						return mRepository.getPokemons();
 					}
 					return mRepository.getPokemon(String.valueOf(query));
 				});
 	}
 
-	public void setQuery(CharSequence query) {
-		// Save the user's query into the SavedStateHandle.
-		// This ensures that we retain the value across process death
-		// and is used as the input into the Transformations.switchMap above
-		mSavedStateHandler.set(QUERY_KEY, query);
-	}
-
 	/**
 	 * Expose the LiveData Products query so the UI can observe it.
 	 */
+	public LiveData<List<Pokemon>> getPokemon(String query) {
+		return mRepository.getPokemon(query);
+	}
+
 	public LiveData<List<Pokemon>> getPokemons() {
-		return mPokemons;
+		return mRepository.getPokemons();
 	}
 }

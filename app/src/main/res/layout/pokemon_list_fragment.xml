@@ -22,8 +22,13 @@
 		<import type="android.view.View" />
 
 		<variable
+			name="pokemonListViewModel"
+			type="c.local.com.example.viewmodel.PokemonListViewModel" />
+
+		<variable
 			name="isLoading"
 			type="boolean" />
+
 	</data>
 
 	<LinearLayout
@@ -52,6 +57,7 @@
 				android:layout_height="48dp"
 				android:contentDescription="@string/cd_search_products"
 				app:srcCompat="@drawable/ic_search_black_24dp" />
+
 
 		</LinearLayout>
 

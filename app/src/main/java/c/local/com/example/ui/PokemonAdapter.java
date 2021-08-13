@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import c.local.com.example.BasicApp;
 import c.local.com.example.R;
 import c.local.com.example.data.Pokemon;
 import c.local.com.example.databinding.PokemonListItemBinding;
@@ -74,7 +77,10 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ProductV
 
 	@Override
 	public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-		holder.binding.setPokemon(mPokemonList.get(position));
+		Pokemon pokemon = mPokemonList.get(position);
+		holder.binding.setPokemon(pokemon);
+		Glide.with(BasicApp.getApp()).load(pokemon.getUrl()).into(holder.binding.image);
+
 		holder.binding.executePendingBindings();
 	}
 

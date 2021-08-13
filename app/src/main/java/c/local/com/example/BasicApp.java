@@ -23,14 +23,22 @@ import c.local.com.example.db.AppDatabase;
 /**
  * Android Application class. Used for accessing singletons.
  */
+
 public class BasicApp extends Application {
 
 	private AppExecutors mAppExecutors;
 
+	private static BasicApp app;
+
+	public static synchronized BasicApp getApp() {
+		return app;
+	}
+
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
+		app = this;
 		mAppExecutors = new AppExecutors();
 	}
 
@@ -38,7 +46,11 @@ public class BasicApp extends Application {
 		return AppDatabase.getInstance(this, mAppExecutors);
 	}
 
+	public PokeAPIService getApi() {
+		return NetworkModule.providePokemonApiService();
+	}
+
 	public DataRepository getRepository() {
-		return DataRepository.getInstance(getDatabase());
+		return DataRepository.getInstance(getDatabase(), getApi());
 	}
 }

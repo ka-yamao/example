@@ -29,18 +29,10 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-
 		// Add product list fragment if this is first creation
 		if (savedInstanceState == null) {
-//			ProductListFragment fragment = new ProductListFragment();
-//
-//			getSupportFragmentManager().beginTransaction()
-//					.add(R.id.fragment_container, fragment, ProductListFragment.TAG).commit();
-			PokemonListFragment fragment = new PokemonListFragment();
-
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, fragment, PokemonListFragment.TAG).commit();
-
+					.add(R.id.fragment_container, MainFragment.newInstance(), PokemonListFragment.TAG).commit();
 		}
 	}
 

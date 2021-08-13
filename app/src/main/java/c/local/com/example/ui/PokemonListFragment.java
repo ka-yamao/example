@@ -18,6 +18,7 @@ package c.local.com.example.ui;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,19 +64,35 @@ public class PokemonListFragment extends Fragment {
 				new ViewModelProvider(this).get(PokemonListViewModel.class);
 
 		mBinding.pokemonSearchBtn.setOnClickListener(v -> {
-			Editable query = mBinding.pokemonSearchBox.getText();
-			viewModel.setQuery(query);
+			String query = String.valueOf(mBinding.pokemonSearchBox.getText());
+			viewModel.getPokemon(query);
 		});
+		mBinding.pokemonSearchBox.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+				viewModel.getPokemon(String.valueOf(s));
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+			}
+		});
+		mBinding.setPokemonListViewModel(viewModel);
 		subscribeUi(viewModel.getPokemons());
 	}
 
 	private void subscribeUi(LiveData<List<Pokemon>> liveData) {
 		// Update the list when the data changes
-		liveData.observe(getViewLifecycleOwner(), myProducts -> {
-			if (myProducts != null) {
+		liveData.observe(getViewLifecycleOwner(), pokemons -> {
+			if (pokemons != null) {
 				mBinding.setIsLoading(false);
-				mPokemonAdapter.setPokemonList(myProducts);
+				mPokemonAdapter.setPokemonList(pokemons);
 			} else {
 				mBinding.setIsLoading(true);
 			}

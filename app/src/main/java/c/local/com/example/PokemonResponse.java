@@ -4,6 +4,14 @@ import java.util.ArrayList;
 
 import c.local.com.example.data.Pokemon;
 
+
+
+
+
+
+/**
+ * Created by Abhinav Singh on 17,June,2020
+ */
 public class PokemonResponse {
 	private Integer count;
 	private String next, previous;
