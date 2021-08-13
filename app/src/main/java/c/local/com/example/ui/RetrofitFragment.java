@@ -17,8 +17,6 @@
 package c.local.com.example.ui;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,70 +33,53 @@ import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
 import c.local.com.example.adapter.PokemonAdapter;
 import c.local.com.example.data.Pokemon;
-import c.local.com.example.databinding.PokemonListFragmentBinding;
-import c.local.com.example.viewmodel.PokemonListViewModel;
+import c.local.com.example.databinding.RetrofitFragmentBinding;
+import c.local.com.example.viewmodel.RetrofitViewModel;
 
-public class PokemonListFragment extends Fragment {
+public class RetrofitFragment extends Fragment {
 
-	public static final String TAG = "ProductListFragment";
+	public static final String TAG = RetrofitFragment.class.getSimpleName();
 
 	private PokemonAdapter mPokemonAdapter;
 
-	private PokemonListFragmentBinding mBinding;
+	private RetrofitFragmentBinding mBinding;
 
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 							 @Nullable Bundle savedInstanceState) {
-		mBinding = DataBindingUtil.inflate(inflater, R.layout.pokemon_list_fragment, container, false);
-
-		mPokemonAdapter = new PokemonAdapter(mPokemonClickCallback);
-		mBinding.pokemonList.setAdapter(mPokemonAdapter);
-
+		mBinding = DataBindingUtil.inflate(inflater, R.layout.retrofit_fragment, container, false);
 		return mBinding.getRoot();
 	}
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		final PokemonListViewModel viewModel =
-				new ViewModelProvider(this).get(PokemonListViewModel.class);
-
-		mBinding.pokemonSearchBtn.setOnClickListener(v -> {
-			String query = String.valueOf(mBinding.pokemonSearchBox.getText());
-			viewModel.fetchPokemon(1);
-		});
-		mBinding.pokemonSearchBox.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-				viewModel.fetchPokemon(1);
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-		});
-		mBinding.setPokemonListViewModel(viewModel);
+		final RetrofitViewModel viewModel =
+				new ViewModelProvider(this).get(RetrofitViewModel.class);
+		mPokemonAdapter = new PokemonAdapter(mPokemonClickCallback);
+		mBinding.setProgress(true);
+		mBinding.pokemonList.setAdapter(mPokemonAdapter);
+		mBinding.setRetrofitViewModel(viewModel);
 		subscribeUi(viewModel.getPokemonList());
+		// １ページ名を取得
+		viewModel.fetchPokemon(1);
+		mBinding.pokemonList.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+			System.out.println("test");
+		});
+
+
 	}
 
 	private void subscribeUi(LiveData<List<Pokemon>> liveData) {
 		// Update the list when the data changes
 		liveData.observe(getViewLifecycleOwner(), pokemons -> {
 			if (pokemons != null) {
-				mBinding.setIsLoading(false);
+				mBinding.setProgress(false);
 				mPokemonAdapter.setPokemonList(pokemons);
 			} else {
-				mBinding.setIsLoading(true);
+				mBinding.setProgress(true);
 			}
-			// espresso does not know how to wait for data binding's loop so we execute changes
-			// sync.
 			mBinding.executePendingBindings();
 		});
 	}

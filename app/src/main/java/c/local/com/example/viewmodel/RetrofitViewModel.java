@@ -23,26 +23,21 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import c.local.com.example.BasicApp;
 import c.local.com.example.DataRepository;
 import c.local.com.example.data.Pokemon;
 
-public class PokemonListViewModel extends AndroidViewModel {
-	private static final String QUERY_KEY = "Poke";
+public class RetrofitViewModel extends AndroidViewModel {
 
-	private final SavedStateHandle mSavedStateHandler;
 	private final DataRepository mRepository;
-	private final LiveData<List<Pokemon>> mPokemons;
+	private boolean isLoading;
 
-	public PokemonListViewModel(@NonNull Application application,
-								@NonNull SavedStateHandle savedStateHandle) {
+
+	public RetrofitViewModel(@NonNull Application application,
+							 @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
-		mSavedStateHandler = savedStateHandle;
 		mRepository = ((BasicApp) application).getRepository();
-		mPokemons = new MediatorLiveData<>();
-
 	}
 
 

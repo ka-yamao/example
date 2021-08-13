@@ -27,6 +27,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
+import c.local.com.example.adapter.CommentAdapter;
 import c.local.com.example.databinding.ProductFragmentBinding;
 import c.local.com.example.viewmodel.ProductViewModel;
 
@@ -45,7 +46,7 @@ public class ProductFragment extends Fragment {
 		// Inflate this data binding layout
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.product_fragment, container, false);
 
-		
+
 		// Create and set the adapter for the RecyclerView.
 		mCommentAdapter = new CommentAdapter(mCommentClickCallback);
 		mBinding.commentList.setAdapter(mCommentAdapter);

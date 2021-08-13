@@ -1,4 +1,4 @@
-package c.local.com.example.ui;
+package c.local.com.example.adapter;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import c.local.com.example.BasicApp;
 import c.local.com.example.R;
 import c.local.com.example.data.Pokemon;
 import c.local.com.example.databinding.PokemonListItemBinding;
+import c.local.com.example.ui.PokemonClickCallback;
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ProductViewHolder> {
 

@@ -30,6 +30,10 @@ public class MainFragment extends Fragment {
 	// データバインディング
 	private MainFragmentBinding mBinding;
 
+	static final int PAGE_COUNT = 5;
+	// タブのタイトル
+	String[] titles = {"Retrofit fetch", "RxJava PublishSubject", "RxJava エラー対応", "Kotlinファイル"};
+
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -47,25 +51,35 @@ public class MainFragment extends Fragment {
 		collectionPagerAdapter = new CollectionPagerAdapter(this);
 		mBinding.pager.setAdapter(collectionPagerAdapter);
 		// タブレイアウトを設定
-		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText("PAGE " + (position + 1))).attach();
+		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText(titles[position])).attach();
+	}
+
+	/**
+	 * ページアダプター
+	 */
+	class CollectionPagerAdapter extends FragmentStateAdapter {
+		public CollectionPagerAdapter(Fragment f) {
+			super(f);
+		}
+
+		@Override
+		public Fragment createFragment(int position) {
+			switch (position) {
+				case 0:
+					return new RetrofitFragment();
+				case 1:
+				case 2:
+				case 3:
+				default:
+					return new PokemonListFragment();
+			}
+
+		}
+
+		@Override
+		public int getItemCount() {
+			return 3;
+		}
 	}
 }
 
-/**
- * ページアダプター
- */
-class CollectionPagerAdapter extends FragmentStateAdapter {
-	public CollectionPagerAdapter(Fragment f) {
-		super(f);
-	}
-
-	@Override
-	public Fragment createFragment(int position) {
-		return new PokemonListFragment();
-	}
-
-	@Override
-	public int getItemCount() {
-		return 3;
-	}
-}
