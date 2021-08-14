@@ -23,6 +23,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import c.local.com.example.BasicApp;
 import c.local.com.example.DataRepository;
@@ -31,13 +32,20 @@ import c.local.com.example.data.Pokemon;
 public class RetrofitViewModel extends AndroidViewModel {
 
 	private final DataRepository mRepository;
+
+	// ポケモンリストのデータ
+	private MediatorLiveData<List<Pokemon>> mObservablePokemon;
+
 	private boolean isLoading;
+
+
 
 
 	public RetrofitViewModel(@NonNull Application application,
 							 @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
 		mRepository = ((BasicApp) application).getRepository();
+
 	}
 
 
@@ -48,8 +56,9 @@ public class RetrofitViewModel extends AndroidViewModel {
 	/**
 	 * Expose the LiveData Products query so the UI can observe it.
 	 */
-	public LiveData<List<Pokemon>> fetchPokemon(int page) {
-		return mRepository.fetchPokemonList(page);
+	public void fetchPokemon(int page) {
+		mRepository.fetchPokemonList(page);
+
 	}
 
 

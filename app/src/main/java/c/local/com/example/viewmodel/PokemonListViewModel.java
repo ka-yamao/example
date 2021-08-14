@@ -53,8 +53,8 @@ public class PokemonListViewModel extends AndroidViewModel {
 	/**
 	 * Expose the LiveData Products query so the UI can observe it.
 	 */
-	public LiveData<List<Pokemon>> fetchPokemon(int page) {
-		return mRepository.fetchPokemonList(page);
+	public void fetchPokemon(int page) {
+		mRepository.fetchPokemonList(page);
 	}
 
 

@@ -43,7 +43,6 @@ public class DataRepository {
 	// 検索実行のプロセル管理
 	public PublishProcessor<Integer> mPublishProcessor;
 
-
 	private MediatorLiveData<List<ProductEntity>> mObservableProducts;
 
 	public static DataRepository getInstance(final AppDatabase database,
@@ -79,65 +78,37 @@ public class DataRepository {
 			// System.out.println("★ Processor：" + p);
 			mPublishSubject.onNext(p);
 		});
-		searchObservable = mPublishSubject.throttleLast(1000, TimeUnit.MILLISECONDS).concatMap(p -> {
-			// System.out.println("★ Subject：" + p);
-			return mApiService.getPokemons();
-		}, 1);
-		setSubscribe(searchObservable);
-		RxJavaPlugins.setErrorHandler(e -> {
-			Log.d(TAG, e.toString());
-		});
-	}
+		searchObservable = mPublishSubject
+				.throttleLast(5000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
+				.concatMap(p -> mApiService.getPokemons(), 1);
 
-	private void setSubscribe(Observable<PokemonResponse2> observable) {
-
-		observable
-				.subscribeOn(Schedulers.io())
+		searchObservable
 				.map(pokemonResponse -> pokemonResponse.toPokemonList())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(result -> {
-							// System.out.println("★ onSuccess");
-							mObservablePokemon.postValue(result);
+							mObservablePokemon.setValue(result);
 						},
 						error -> {
 							// System.out.println("★ onSuccess");
 						}, () -> {
 							// System.out.println("★ onComplete");
 						});
+
+		RxJavaPlugins.setErrorHandler(e -> {
+			Log.d(TAG, e.toString());
+		});
+
 	}
 
+	public void fetchPokemonList(int page) {
+		mObservablePokemon.setValue(new ArrayList<>());
+		mPublishSubject.onNext(page);
+		// mPublishProcessor.onNext(page);
+	}
 
 	public LiveData<List<Pokemon>> getPokemonList() {
 		return mObservablePokemon;
 	}
-
-
-	public LiveData<List<Pokemon>> fetchPokemonList(int page) {
-
-		mPublishSubject.onNext(page);
-		// mPublishProcessor.onNext(page);
-
-//		for (int i = 0; i < 10; i++) {
-//			System.out.println("hoge onNext: " + i);
-//			mPublishProcessor.onNext("" + i);
-//		}
-
-
-//		mApiService.getPokemons()
-//				.subscribeOn(Schedulers.io())
-//				.map(pokemonResponse -> {
-//					return pokemonResponse.toPokemonList();
-//				})
-//				.observeOn(AndroidSchedulers.mainThread())
-//				.subscribe(result -> {
-//							mObservablePokemon.setValue(result);
-//						},
-//						error -> {
-//							Log.e("", "getPokemons: " + error.getMessage());
-//						});
-		return mObservablePokemon;
-	}
-
 
 	/**
 	 * Get the list of products from the database and get notified when the data changes.
