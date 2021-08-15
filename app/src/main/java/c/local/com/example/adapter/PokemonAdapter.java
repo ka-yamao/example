@@ -1,6 +1,5 @@
 package c.local.com.example.adapter;
 
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -11,7 +10,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import c.local.com.example.BasicApp;
 import c.local.com.example.R;
@@ -20,6 +18,8 @@ import c.local.com.example.databinding.PokemonListItemBinding;
 import c.local.com.example.ui.PokemonClickCallback;
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ProductViewHolder> {
+
+	public static final String TAG = PokemonAdapter.class.getSimpleName();
 
 	List<? extends Pokemon> mPokemonList;
 
@@ -36,33 +36,38 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ProductV
 			mPokemonList = pokemonList;
 			notifyItemRangeInserted(0, pokemonList.size());
 		} else {
-			DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-				@Override
-				public int getOldListSize() {
-					return mPokemonList.size();
-				}
-
-				@Override
-				public int getNewListSize() {
-					return pokemonList.size();
-				}
-
-				@Override
-				public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-					return mPokemonList.get(oldItemPosition).getId() ==
-							pokemonList.get(newItemPosition).getId();
-				}
-
-				@Override
-				public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-					Pokemon newProduct = pokemonList.get(newItemPosition);
-					Pokemon oldProduct = mPokemonList.get(oldItemPosition);
-					return newProduct.getId() == oldProduct.getId()
-							&& TextUtils.equals(newProduct.getName(), oldProduct.getName());
-				}
-			});
 			mPokemonList = pokemonList;
-			result.dispatchUpdatesTo(this);
+			notifyDataSetChanged();
+//			DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+//				@Override
+//				public int getOldListSize() {
+//					return mPokemonList.size();
+//				}
+//
+//				@Override
+//				public int getNewListSize() {
+//					return pokemonList.size();
+//				}
+//
+//				@Override
+//				public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+//					int oldId = mPokemonList.get(oldItemPosition).getId();
+//					int newId = pokemonList.get(newItemPosition).getId();
+//					DLog.d(TAG, "oldId:"+ oldId + ", newId:" + newId);
+//					return mPokemonList.get(oldItemPosition).getId() ==
+//							pokemonList.get(newItemPosition).getId();
+//				}
+//
+//				@Override
+//				public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+//					Pokemon newProduct = pokemonList.get(newItemPosition);
+//					Pokemon oldProduct = mPokemonList.get(oldItemPosition);
+//					return newProduct.getId() == oldProduct.getId()
+//							&& TextUtils.equals(newProduct.getName(), oldProduct.getName());
+//				}
+//			});
+//			mPokemonList = pokemonList;
+//			result.dispatchUpdatesTo(this);
 		}
 	}
 

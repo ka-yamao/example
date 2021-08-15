@@ -71,7 +71,7 @@ public class MainFragment extends Fragment {
 				case 2:
 				case 3:
 				default:
-					return new PokemonListFragment();
+					return new BlankFragment();
 			}
 
 		}

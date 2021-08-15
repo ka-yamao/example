@@ -32,6 +32,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import c.local.com.example.DLog;
 import c.local.com.example.R;
 import c.local.com.example.adapter.PokemonAdapter;
 import c.local.com.example.data.Pokemon;
@@ -90,10 +91,11 @@ public class RetrofitFragment extends Fragment {
 
 	private void subscribeUi(LiveData<List<Pokemon>> liveData) {
 		// Update the list when the data changes
-		liveData.observe(getViewLifecycleOwner(), pokemons -> {
-			if (pokemons != null) {
+		liveData.observe(getViewLifecycleOwner(), pokemonList -> {
+			if (pokemonList != null) {
 				mBinding.setProgress(false);
-				mPokemonAdapter.setPokemonList(pokemons);
+				DLog.d(TAG,"list size: " + pokemonList.size());
+				mPokemonAdapter.setPokemonList(pokemonList);
 			} else {
 				mBinding.setProgress(true);
 			}

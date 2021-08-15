@@ -82,19 +82,22 @@ public class DataRepository {
 	 */
 	public Disposable createObservable(MediatorLiveData<List<Pokemon>> pokemonList, MediatorLiveData<PokemonListInfo> pokemonListInfo) {
 		return mPublishSubject
-				.throttleLast(3000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
+				.throttleLast(1000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
 				.concatMap(info -> {
 					return mApiService.getPokemons(info.toQueryMap());
 				}, 1)
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(result -> {
-							pokemonListInfo.setValue(new PokemonListInfo(result.count, result.next));
+							PokemonListInfo info = new PokemonListInfo(result.count, result.next);
+							DLog.d(TAG,"subscribe limit: " + info.limit + ", offset: " + info.offset);
+							pokemonListInfo.setValue(info);
 							List<Pokemon> list = pokemonList.getValue();
 							if (result.previous == null) {
 								list = result.toPokemonList();
 							} else {
 								list.addAll(result.toPokemonList());
 							}
+							DLog.d(TAG,"list size: " + list.size());
 							pokemonList.setValue(list);
 					},
 						error -> {
@@ -105,6 +108,7 @@ public class DataRepository {
 	}
 
 	public void fetch(PokemonListInfo pokemonListInfo) {
+		DLog.d(TAG,"onNext limit: " + pokemonListInfo.limit + ", offset: " + pokemonListInfo.offset);
 		mPublishSubject.onNext(pokemonListInfo);
 		// mPublishProcessor.onNext(page);
 	}
