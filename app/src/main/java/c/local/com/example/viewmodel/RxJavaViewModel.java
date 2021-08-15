@@ -46,7 +46,8 @@ public class RxJavaViewModel extends AndroidViewModel {
 	public RxJavaViewModel(@NonNull Application application,
 							 @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
-
+		mLogListLiveData = new MediatorLiveData<>();
+		mLogListLiveData.setValue(new ArrayList<>());
 		mApiService = BasicApp.getApp().getApi();
 		mPublishProcessor = PublishProcessor.create();
 		mPublishProcessor.onBackpressureLatest().observeOn(Schedulers.from(Executors.newCachedThreadPool()), false, 1).subscribe(p -> {
@@ -123,9 +124,6 @@ public class RxJavaViewModel extends AndroidViewModel {
 		SimpleDateFormat sdf = new SimpleDateFormat("hh時mm分ss秒SSSミリ秒 ");
 		String l = sdf.format(calendar.getTime()) + " : " + log;
 		List<String> logs = mLogListLiveData.getValue();
-		if (logs == null)  {
-			logs = new ArrayList<>();
-		}
 		logs.add(0, l);
 		mLogListLiveData.postValue(logs);
 	}
