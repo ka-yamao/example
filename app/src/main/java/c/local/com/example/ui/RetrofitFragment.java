@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -27,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -114,8 +114,6 @@ public class RetrofitFragment extends Fragment {
 	}
 
 	private final PokemonClickCallback mPokemonClickCallback = pokemon -> {
-		if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-			((MainActivity) requireActivity()).showPokemon(pokemon);
-		}
+		Toast.makeText(getContext(), pokemon.getName(),Toast.LENGTH_SHORT).show();
 	};
 }

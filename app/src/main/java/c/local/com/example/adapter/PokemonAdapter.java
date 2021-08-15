@@ -86,7 +86,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.ProductV
 		Pokemon pokemon = mPokemonList.get(position);
 		holder.binding.setPokemon(pokemon);
 		Glide.with(BasicApp.getApp()).load(pokemon.getUrl()).into(holder.binding.image);
-
 		holder.binding.executePendingBindings();
 	}
 

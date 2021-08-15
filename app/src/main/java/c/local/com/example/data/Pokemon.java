@@ -1,5 +1,6 @@
 package c.local.com.example.data;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Pokemon {
@@ -14,7 +15,8 @@ public class Pokemon {
 		this.name = name;
 		this.url = url;
 		Calendar calendar = Calendar.getInstance();
-		this.date = calendar.getTime().toString();
+		SimpleDateFormat sdf = new SimpleDateFormat("hh時mm分ss秒SSSミリ秒 ");
+		this.date = sdf.format(calendar.getTime());
 	}
 
 	public String getName() {

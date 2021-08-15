@@ -32,7 +32,7 @@ public class MainFragment extends Fragment {
 
 	static final int PAGE_COUNT = 5;
 	// タブのタイトル
-	String[] titles = {"Retrofit fetch", "RxJava PublishSubject", "RxJava エラー対応", "Kotlinファイル"};
+	String[] titles = {"Retrofit", "RxJava", "RxJava エラー対応", "Kotlinファイル"};
 
 
 	@Override
@@ -52,6 +52,8 @@ public class MainFragment extends Fragment {
 		mBinding.pager.setAdapter(collectionPagerAdapter);
 		// タブレイアウトを設定
 		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText(titles[position])).attach();
+		// デフォルトページ
+		mBinding.pager.setCurrentItem(0);
 	}
 
 	/**
@@ -66,8 +68,9 @@ public class MainFragment extends Fragment {
 		public Fragment createFragment(int position) {
 			switch (position) {
 				case 0:
-					return new RetrofitFragment();
+					return RxJavaFragment.newInstance();
 				case 1:
+					// return new RetrofitFragment();
 				case 2:
 				case 3:
 				default:
