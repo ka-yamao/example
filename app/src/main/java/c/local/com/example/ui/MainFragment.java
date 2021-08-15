@@ -30,7 +30,7 @@ public class MainFragment extends Fragment {
 	// データバインディング
 	private MainFragmentBinding mBinding;
 
-	static final int PAGE_COUNT = 5;
+	static final int PAGE_COUNT = 4;
 	// タブのタイトル
 	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Blank"};
 
