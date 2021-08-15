@@ -43,6 +43,10 @@ public class RetrofitFragment extends Fragment {
 
 	public static final String TAG = RetrofitFragment.class.getSimpleName();
 
+	public static RetrofitFragment newInstance() {
+		return new RetrofitFragment();
+	}
+
 	private PokemonAdapter mPokemonAdapter;
 
 	private RetrofitFragmentBinding mBinding;

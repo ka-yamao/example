@@ -32,8 +32,7 @@ public class MainFragment extends Fragment {
 
 	static final int PAGE_COUNT = 5;
 	// タブのタイトル
-	String[] titles = {"Retrofit", "RxJava", "RxJava エラー対応", "Kotlinファイル"};
-
+	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Blank"};
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -41,6 +40,7 @@ public class MainFragment extends Fragment {
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false);
 		return mBinding.getRoot();
 	}
+
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -68,10 +68,11 @@ public class MainFragment extends Fragment {
 		public Fragment createFragment(int position) {
 			switch (position) {
 				case 0:
-					return RxJavaFragment.newInstance();
+					return RetrofitFragment.newInstance();
 				case 1:
-					// return new RetrofitFragment();
+				return RxJavaFragment.newInstance();
 				case 2:
+					return KotlinFragment.Companion.newInstance();
 				case 3:
 				default:
 					return new BlankFragment();
@@ -81,7 +82,7 @@ public class MainFragment extends Fragment {
 
 		@Override
 		public int getItemCount() {
-			return 3;
+			return PAGE_COUNT;
 		}
 	}
 }
