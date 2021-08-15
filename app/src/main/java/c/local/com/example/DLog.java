@@ -1,6 +1,8 @@
 package c.local.com.example;
 
-public class Log {
+import android.util.Log;
+
+public class DLog {
 	public static void d(String tag, String log) {
 		Log.d("★" + tag, log);
 	}

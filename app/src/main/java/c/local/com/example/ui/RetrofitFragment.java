@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import c.local.com.example.R;
 import c.local.com.example.adapter.PokemonAdapter;
@@ -65,15 +66,20 @@ public class RetrofitFragment extends Fragment {
 		mBinding.setProgress(true);
 		mBinding.pokemonList.setAdapter(mPokemonAdapter);
 		mBinding.setRetrofitViewModel(mViewModel);
-		subscribeUi(mViewModel.getPokemonList());
+		subscribeUi(mViewModel.getPokemonListLiveData());
 		mBinding.refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				mViewModel.fetchPokemon(1);
+				mBinding.setProgress(true);
+				mViewModel.fetch(false);
 			}
 		});
-		mBinding.pokemonList.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-			System.out.println("test");
+
+		mBinding.pokemonList.addOnScrollListener(new EndlessScrollListener((LinearLayoutManager) mBinding.pokemonList.getLayoutManager()) {
+			@Override
+			public void onLoadMore(int page) {
+				mViewModel.fetch(true);
+			}
 		});
 	}
 
@@ -95,7 +101,7 @@ public class RetrofitFragment extends Fragment {
 			mBinding.refresh.setRefreshing(false);
 		});
 		// １ページ名を取得
-		mViewModel.fetchPokemon(1);
+		mViewModel.fetch(false);
 	}
 
 	@Override

@@ -28,38 +28,45 @@ import androidx.lifecycle.SavedStateHandle;
 import c.local.com.example.BasicApp;
 import c.local.com.example.DataRepository;
 import c.local.com.example.data.Pokemon;
+import c.local.com.example.data.PokemonListInfo;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class RetrofitViewModel extends AndroidViewModel {
 
 	private final DataRepository mRepository;
 
+	private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
 	// ポケモンリストのデータ
-	private MediatorLiveData<List<Pokemon>> mObservablePokemon;
+	private MediatorLiveData<List<Pokemon>> mPokemonListLiveData = new MediatorLiveData<>();
 
-	private boolean isLoading;
-
-
-
+	private MediatorLiveData<PokemonListInfo> mPokemonListInfo = new MediatorLiveData<>();
 
 	public RetrofitViewModel(@NonNull Application application,
 							 @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
 		mRepository = ((BasicApp) application).getRepository();
-
+		compositeDisposable.add(mRepository.createObservable(mPokemonListLiveData, mPokemonListInfo));
 	}
 
+	public LiveData<List<Pokemon>> getPokemonListLiveData() {
+		return mPokemonListLiveData;
+	}
 
-	public LiveData<List<Pokemon>> getPokemonList() {
-		return mRepository.getPokemonList();
+	public LiveData<PokemonListInfo> getPokemonListInfoLiveData() {
+		return mPokemonListInfo;
 	}
 
 	/**
 	 * Expose the LiveData Products query so the UI can observe it.
 	 */
-	public void fetchPokemon(int page) {
-		mRepository.fetchPokemonList(page);
-
+	public void fetch(boolean isAdd) {
+		mRepository.fetch(isAdd ? mPokemonListInfo.getValue(): new PokemonListInfo());
 	}
 
-
+	@Override
+	protected void onCleared() {
+		super.onCleared();
+		compositeDisposable.clear();
+	}
 }

@@ -9,7 +9,6 @@ public class Pokemon {
 	private String url;
 	private String  date;
 
-
 	public Pokemon(int id, String name, String url) {
 		this.id = id;
 		this.name = name;

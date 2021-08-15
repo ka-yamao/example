@@ -1,7 +1,6 @@
 package c.local.com.example;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -9,11 +8,12 @@ import java.util.concurrent.TimeUnit;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import c.local.com.example.data.Pokemon;
+import c.local.com.example.data.PokemonListInfo;
 import c.local.com.example.db.AppDatabase;
 import c.local.com.example.db.entity.CommentEntity;
 import c.local.com.example.db.entity.ProductEntity;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.processors.PublishProcessor;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -32,16 +32,10 @@ public class DataRepository {
 	private final AppDatabase mDatabase;
 	// API
 	private PokeAPIService mApiService;
-	// ポケモンリストのデータ
-	private MediatorLiveData<List<Pokemon>> mObservablePokemon;
-	// ページ
-	private MediatorLiveData<Integer> mPage;
 	// 検索のサブジェクト
-	private PublishSubject<Integer> mPublishSubject;
-	// 検索のObservable
-	private Observable<PokemonResponse2> searchObservable;
+	private PublishSubject<PokemonListInfo> mPublishSubject;
 	// 検索実行のプロセル管理
-	public PublishProcessor<Integer> mPublishProcessor;
+	public PublishProcessor<PokemonListInfo> mPublishProcessor;
 
 	private MediatorLiveData<List<ProductEntity>> mObservableProducts;
 
@@ -68,9 +62,6 @@ public class DataRepository {
 					}
 				});
 
-		// Pokemon
-		mObservablePokemon = new MediatorLiveData<>();
-		mPage = new MediatorLiveData<>();
 		mApiService = apiService;
 		mPublishSubject = PublishSubject.create();
 		mPublishProcessor = PublishProcessor.create();
@@ -78,36 +69,44 @@ public class DataRepository {
 			// System.out.println("★ Processor：" + p);
 			mPublishSubject.onNext(p);
 		});
-		searchObservable = mPublishSubject
-				.throttleLast(5000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
-				.concatMap(p -> mApiService.getPokemons(), 1);
+		RxJavaPlugins.setErrorHandler(e -> {
+			DLog.d(TAG, e.toString());
+		});
+	}
 
-		searchObservable
-				.map(pokemonResponse -> pokemonResponse.toPokemonList())
+	/**
+	 * 検索
+	 * @param pokemonList
+	 * @param pokemonListInfo
+	 * @return
+	 */
+	public Disposable createObservable(MediatorLiveData<List<Pokemon>> pokemonList, MediatorLiveData<PokemonListInfo> pokemonListInfo) {
+		return mPublishSubject
+				.throttleLast(3000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
+				.concatMap(info -> {
+					return mApiService.getPokemons(info.toQueryMap());
+				}, 1)
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(result -> {
-							mObservablePokemon.setValue(result);
-						},
+							pokemonListInfo.setValue(new PokemonListInfo(result.count, result.next));
+							List<Pokemon> list = pokemonList.getValue();
+							if (result.previous == null) {
+								list = result.toPokemonList();
+							} else {
+								list.addAll(result.toPokemonList());
+							}
+							pokemonList.setValue(list);
+					},
 						error -> {
 							// System.out.println("★ onSuccess");
 						}, () -> {
 							// System.out.println("★ onComplete");
 						});
-
-		RxJavaPlugins.setErrorHandler(e -> {
-			Log.d(TAG, e.toString());
-		});
-
 	}
 
-	public void fetchPokemonList(int page) {
-		mObservablePokemon.setValue(new ArrayList<>());
-		mPublishSubject.onNext(page);
+	public void fetch(PokemonListInfo pokemonListInfo) {
+		mPublishSubject.onNext(pokemonListInfo);
 		// mPublishProcessor.onNext(page);
-	}
-
-	public LiveData<List<Pokemon>> getPokemonList() {
-		return mObservablePokemon;
 	}
 
 	/**
@@ -127,14 +126,5 @@ public class DataRepository {
 
 	public LiveData<List<ProductEntity>> searchProducts(String query) {
 		return mDatabase.productDao().searchAllProducts(query);
-	}
-
-
-	public void clearPokemon() {
-		mObservablePokemon.setValue(new ArrayList<>());
-	}
-
-	public boolean isPokemon() {
-		return mObservablePokemon.getValue().size() > 0;
 	}
 }

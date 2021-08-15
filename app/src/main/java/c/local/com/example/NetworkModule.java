@@ -7,7 +7,6 @@ import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkModule {
@@ -25,16 +24,6 @@ public class NetworkModule {
 				.create(PokeAPIService.class);
 	}
 
-	public static PokeAPIService providePokemonApiServiceGson() {
-
-		return new Retrofit.Builder()
-				.baseUrl("https://pokeapi.co/api/v2/")
-				.addConverterFactory(GsonConverterFactory.create())
-				.addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-				.build()
-				.create(PokeAPIService.class);
-	}
-
 	/**
 	 * HTTPヘッダーを操作、URLのログを出力するため
 	 *
@@ -46,7 +35,8 @@ public class NetworkModule {
 		httpClient.addInterceptor(chain -> {
 			Request original = chain.request();
 
-			// Log.d(TAG, original.url().toString());
+			DLog.d(TAG, original.url().toString());
+
 			//header設定
 			Request request = original.newBuilder()
 					.header("Accept", "application/json")
