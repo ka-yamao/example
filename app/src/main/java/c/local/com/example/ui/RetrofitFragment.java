@@ -31,7 +31,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import c.local.com.example.DLog;
 import c.local.com.example.R;
 import c.local.com.example.adapter.PokemonAdapter;
@@ -51,7 +50,7 @@ public class RetrofitFragment extends Fragment {
 
 	private RetrofitFragmentBinding mBinding;
 
-	private  RetrofitViewModel mViewModel;
+	private RetrofitViewModel mViewModel;
 
 	@Nullable
 	@Override
@@ -68,16 +67,13 @@ public class RetrofitFragment extends Fragment {
 		mViewModel = new ViewModelProvider(this).get(RetrofitViewModel.class);
 		// Adapter 初期化
 		mPokemonAdapter = new PokemonAdapter(mPokemonClickCallback);
-		mBinding.setProgress(true);
+		mBinding.setIsLoading(true);
 		mBinding.pokemonList.setAdapter(mPokemonAdapter);
 		mBinding.setRetrofitViewModel(mViewModel);
 		subscribeUi(mViewModel.getPokemonListLiveData());
-		mBinding.refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			@Override
-			public void onRefresh() {
-				mBinding.setProgress(true);
-				mViewModel.fetch(false);
-			}
+		mBinding.refresh.setOnRefreshListener(() -> {
+			mBinding.setIsLoading(true);
+			mViewModel.fetch(false);
 		});
 
 		mBinding.pokemonList.addOnScrollListener(new EndlessScrollListener((LinearLayoutManager) mBinding.pokemonList.getLayoutManager()) {
@@ -97,11 +93,11 @@ public class RetrofitFragment extends Fragment {
 		// Update the list when the data changes
 		liveData.observe(getViewLifecycleOwner(), pokemonList -> {
 			if (pokemonList != null) {
-				mBinding.setProgress(false);
-				DLog.d(TAG,"list size: " + pokemonList.size());
+				mBinding.setIsLoading(false);
+				DLog.d(TAG, "list size: " + pokemonList.size());
 				mPokemonAdapter.setPokemonList(pokemonList);
 			} else {
-				mBinding.setProgress(true);
+				mBinding.setIsLoading(true);
 			}
 			mBinding.executePendingBindings();
 			mBinding.refresh.setRefreshing(false);
@@ -117,7 +113,5 @@ public class RetrofitFragment extends Fragment {
 		super.onDestroyView();
 	}
 
-	private final PokemonClickCallback mPokemonClickCallback = pokemon -> {
-		Toast.makeText(getContext(), pokemon.getName(),Toast.LENGTH_SHORT).show();
-	};
+	private final PokemonClickCallback mPokemonClickCallback = pokemon -> Toast.makeText(getContext(), pokemon.getName(), Toast.LENGTH_SHORT).show();
 }

@@ -26,7 +26,7 @@
 			type="c.local.com.example.viewmodel.RetrofitViewModel" />
 
 		<variable
-			name="progress"
+			name="isLoading"
 			type="boolean" />
 
 	</data>
@@ -44,13 +44,12 @@
 			android:layout_height="30dp"
 			android:layout_marginVertical="50dp"
 			android:layout_gravity="center"
-			android:visibility="@{progress ?  View.VISIBLE : View.GONE}" />
+			android:visibility="@{isLoading ?  View.VISIBLE : View.GONE}" />
 
 		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 			android:id="@+id/refresh"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			>
+			android:layout_height="match_parent">
 
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/pokemon_list"
@@ -58,7 +57,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				app:layoutManager="LinearLayoutManager"
-				android:visibility="@{progress ?  View.GONE : View.VISIBLE}" />
+				android:visibility="@{isLoading ?  View.GONE : View.VISIBLE}" />
 
 		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 	</LinearLayout>

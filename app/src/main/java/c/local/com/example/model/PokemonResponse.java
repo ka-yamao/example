@@ -1,4 +1,4 @@
-package c.local.com.example;
+package c.local.com.example.model;
 
 import java.util.ArrayList;
 import java.util.List;
