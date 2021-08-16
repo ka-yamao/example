@@ -30,23 +30,27 @@ import c.local.com.example.DataRepository;
 import c.local.com.example.data.Pokemon;
 import c.local.com.example.data.PokemonListInfo;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class RetrofitViewModel extends AndroidViewModel {
-
+	// Repositoryクラス
 	private final DataRepository mRepository;
-
+	// まとめて Dispose するクラス
 	private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
 	// ポケモンリストのデータ
 	private MediatorLiveData<List<Pokemon>> mPokemonListLiveData = new MediatorLiveData<>();
+	// LiveData
+	private MediatorLiveData<PokemonListInfo> mPokemonListInfoLiveData = new MediatorLiveData<>();
 
-	private MediatorLiveData<PokemonListInfo> mPokemonListInfo = new MediatorLiveData<>();
-
+	// コンストラクタ
 	public RetrofitViewModel(@NonNull Application application,
 							 @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
+		// Repository の生成
 		mRepository = ((BasicApp) application).getRepository();
-		compositeDisposable.add(mRepository.createObservable(mPokemonListLiveData, mPokemonListInfo));
+		// LiveData を渡して、Observable を生成し、subscribe で LiveData を更新する
+		Disposable disposable = mRepository.createObservableSubscribe(mPokemonListLiveData, mPokemonListInfoLiveData);
+		compositeDisposable.add(disposable);
 	}
 
 	public LiveData<List<Pokemon>> getPokemonListLiveData() {
@@ -54,14 +58,14 @@ public class RetrofitViewModel extends AndroidViewModel {
 	}
 
 	public LiveData<PokemonListInfo> getPokemonListInfoLiveData() {
-		return mPokemonListInfo;
+		return mPokemonListInfoLiveData;
 	}
 
 	/**
-	 * Expose the LiveData Products query so the UI can observe it.
+	 * ポケモンリストの取得、追加読み込み
 	 */
 	public void fetch(boolean isAdd) {
-		mRepository.fetch(isAdd ? mPokemonListInfo.getValue(): new PokemonListInfo());
+		mRepository.fetch(isAdd ? mPokemonListInfoLiveData.getValue() : new PokemonListInfo());
 	}
 
 	@Override

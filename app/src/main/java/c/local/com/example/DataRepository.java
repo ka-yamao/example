@@ -47,7 +47,6 @@ public class DataRepository {
 		mPublishSubject = PublishSubject.create();
 		mPublishProcessor = PublishProcessor.create();
 		mPublishProcessor.onBackpressureLatest().observeOn(Schedulers.from(Executors.newCachedThreadPool()), false, 1).subscribe(p -> {
-			// System.out.println("★ Processor：" + p);
 			mPublishSubject.onNext(p);
 		});
 		RxJavaPlugins.setErrorHandler(e -> {
@@ -56,41 +55,47 @@ public class DataRepository {
 	}
 
 	/**
-	 * 検索
+	 * ポケモンのリストを取得
 	 *
 	 * @param pokemonList
 	 * @param pokemonListInfo
 	 * @return
 	 */
-	public Disposable createObservable(MediatorLiveData<List<Pokemon>> pokemonList, MediatorLiveData<PokemonListInfo> pokemonListInfo) {
+	public Disposable createObservableSubscribe(MediatorLiveData<List<Pokemon>> pokemonList, MediatorLiveData<PokemonListInfo> pokemonListInfo) {
 		return mPublishSubject
-				.throttleLast(1000, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io())
-				.concatMap(info -> {
-					return mApiService.getPokemons(info.toQueryMap());
-				}, 1)
+				// 1000ミリ秒間の間で最後の値を流す
+				.throttleLast(1000, TimeUnit.MILLISECONDS)
+				// 入出力用のスレッド
+				.subscribeOn(Schedulers.io())
+				// 非同期の解決順で並び、APIで Observable<PokemonResponse> を取得
+				.concatMap(info -> mApiService.getPokemons(info.toQueryMap()), 1)
+				// メインスレッド
 				.observeOn(AndroidSchedulers.mainThread())
+				// サブスクライブ リストを生成して、LiveData へ設定
 				.subscribe(result -> {
-							PokemonListInfo info = new PokemonListInfo(result.count, result.next);
-							DLog.d(TAG, "subscribe limit: " + info.limit + ", offset: " + info.offset);
-							pokemonListInfo.setValue(info);
+							// ポケモンのリスト作成
 							List<Pokemon> list = pokemonList.getValue();
 							if (result.previous == null) {
 								list = result.toPokemonList();
 							} else {
 								list.addAll(result.toPokemonList());
 							}
-							DLog.d(TAG, "list size: " + list.size());
+							// ポケモンリストを LiveDataへ設定 ※メインスレッドなので setValue
 							pokemonList.setValue(list);
+							// リストのページ情報
+							PokemonListInfo info = new PokemonListInfo(result.count, result.next);
+							// リストのページ情報を LiveDataへ設定 ※メインスレッドなので setValue
+							pokemonListInfo.setValue(info);
 						},
 						error -> {
-							// System.out.println("★ onSuccess");
+							// ※省略
 						}, () -> {
-							// System.out.println("★ onComplete");
+							// ※省略
 						});
 	}
 
 	public void fetch(PokemonListInfo pokemonListInfo) {
-		DLog.d(TAG, "onNext limit: " + pokemonListInfo.limit + ", offset: " + pokemonListInfo.offset);
+		// onNext で ページ情報を流す
 		mPublishSubject.onNext(pokemonListInfo);
 		// Subject だけで大丈夫そう
 		// mPublishProcessor.onNext(page);

@@ -42,16 +42,24 @@ public class RxJavaViewModel extends AndroidViewModel {
 		mLogListLiveData = new MediatorLiveData<>();
 		mLogListLiveData.setValue(new ArrayList<>());
 		mApiService = BasicApp.getApp().getApi();
+
+		// PublishProcessor を生成
 		mPublishProcessor = PublishProcessor.create();
 		mPublishProcessor.onBackpressureLatest().observeOn(Schedulers.from(Executors.newCachedThreadPool()), false, 1).subscribe(p -> {
 			log("processor");
 			mPublishSubject.onNext(p);
 		});
+		// PublishSubject を生成
 		Disposable disposable = createObservable();
+		// Dispose を追加
 		compositeDisposable.add(disposable);
 	}
 
-
+	/**
+	 * PublishSubject を生成、subscribe しておく
+	 *
+	 * @return
+	 */
 	public Disposable createObservable() {
 		mPublishSubject = PublishSubject.create();
 		return mPublishSubject
@@ -71,47 +79,55 @@ public class RxJavaViewModel extends AndroidViewModel {
 						});
 	}
 
-
+	/**
+	 * ボタンの別の処理
+	 *
+	 * @param index
+	 */
 	public void fetch(int index) {
-
 		log("index :" + index);
 		switch (index) {
 			case 0:
+				// PublishProcessor & PublishSubject
 				log("onNext");
 				mPublishProcessor.onNext(new PokemonListInfo());
 				break;
 			case 1:
+				// PublishSubject
 				log("onNext");
 				mPublishSubject.onNext(new PokemonListInfo());
 				break;
 			case 2:
+				// エラー
 				log("onNext");
 				mPublishSubject.onNext(new PokemonListInfo(0, "sdss"));
 				break;
 			case 3:
+				// PublishProcessor 10回連打
 				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishProcessor.onNext(new PokemonListInfo());
 				}
 				break;
 			case 4:
+				// PublishSubject 10回連打
 				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishSubject.onNext(new PokemonListInfo());
 				}
 				break;
 			case 999:
-				for (int i = 0; i < 10; i++) {
-					mLogListLiveData.postValue(new ArrayList<>());
-				}
+				// ログのクリア
+				mLogListLiveData.postValue(new ArrayList<>());
 				break;
 		}
 	}
 
-	public MediatorLiveData<List<String>> getLogListLiveData() {
-		return mLogListLiveData;
-	}
-
+	/**
+	 * ログを LiveData へ追加
+	 *
+	 * @param log
+	 */
 	public void log(String log) {
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("hh時mm分ss秒SSSミリ秒 ");
@@ -119,6 +135,10 @@ public class RxJavaViewModel extends AndroidViewModel {
 		List<String> logs = mLogListLiveData.getValue();
 		logs.add(0, l);
 		mLogListLiveData.postValue(logs);
+	}
+
+	public MediatorLiveData<List<String>> getLogListLiveData() {
+		return mLogListLiveData;
 	}
 
 	@Override

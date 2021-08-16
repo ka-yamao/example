@@ -12,16 +12,21 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class NetworkModule {
 	public static final String TAG = NetworkModule.class.getSimpleName();
 
+	/**
+	 * PokeAPIService の具象クラス
+	 *
+	 * @return PokeAPIService
+	 */
 	public static PokeAPIService providePokemonApiService() {
 
 		Moshi moshi = new Moshi.Builder().build();
 		return new Retrofit.Builder()
-				.baseUrl("https://pokeapi.co/api/v2/")
-				.addConverterFactory(MoshiConverterFactory.create(moshi))
-				.addCallAdapterFactory(RxJava3CallAdapterFactory.createAsync())
-				.client(createHttpClient())
+				.baseUrl("https://pokeapi.co/api/v2/")                    // ベースURLの設定
+				.addConverterFactory(MoshiConverterFactory.create(moshi)) // JSON パーサーに Moshi を設定
+				.addCallAdapterFactory(RxJava3CallAdapterFactory.createAsync()) // Rxjava を利用するので設定
+				.client(createHttpClient())                               // HTTPクライアントを設定
 				.build()
-				.create(PokeAPIService.class);
+				.create(PokeAPIService.class);    // APIのインターフェースを設定
 	}
 
 	/**
