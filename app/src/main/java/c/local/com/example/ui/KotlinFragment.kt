@@ -15,25 +15,29 @@ class KotlinFragment : Fragment() {
         fun newInstance() = KotlinFragment()
     }
 
+    private lateinit var binding: KotlinFragmentBinding
+
     private lateinit var viewModel: KotlinViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-//        val binding = DataBindingUtil.inflate<KotlinFragmentBinding>(
-//            inflater,
-//            R.layout.kotlin_fragment,
-//            container,
-//            false
-//        )
-        val binding = KotlinFragmentBinding.inflate(inflater, container, false)
+        binding = KotlinFragmentBinding.inflate(inflater, container, false)
+        // もしくは下記で、KotlinFragmentBinding を取得
+        /*
+        binding = DataBindingUtil.inflate<KotlinFragmentBinding>(
+            inflater, R.layout.kotlin_fragment,
+            container,
+            false
+        )
+        */
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(KotlinViewModel::class.java)
-
     }
 }
