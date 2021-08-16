@@ -78,7 +78,7 @@
 				android:layout_height="wrap_content"
 				android:contentDescription="@string/cd_product_name"
 				android:text="@{pokemon.date}"
-				tools:text="Pikachu" />
+				tools:text="12時00分00秒000ミリ秒" />
 
 		</LinearLayout>
 

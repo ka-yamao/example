@@ -1,4 +1,4 @@
-package c.local.com.example.ui
+package c.local.com.example.viewmodel
 
 import androidx.lifecycle.ViewModel
 

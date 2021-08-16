@@ -18,8 +18,6 @@ package c.local.com.example;
 
 import android.app.Application;
 
-import c.local.com.example.db.AppDatabase;
-
 /**
  * Android Application class. Used for accessing singletons.
  */
@@ -41,16 +39,12 @@ public class BasicApp extends Application {
 		app = this;
 		mAppExecutors = new AppExecutors();
 	}
-
-	public AppDatabase getDatabase() {
-		return AppDatabase.getInstance(this, mAppExecutors);
-	}
-
+	
 	public PokeAPIService getApi() {
 		return NetworkModule.providePokemonApiService();
 	}
 
 	public DataRepository getRepository() {
-		return DataRepository.getInstance(getDatabase(), getApi());
+		return DataRepository.getInstance(getApi());
 	}
 }

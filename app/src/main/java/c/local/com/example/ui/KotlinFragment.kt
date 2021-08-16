@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import c.local.com.example.databinding.KotlinFragmentBinding
+import c.local.com.example.viewmodel.KotlinViewModel
 
 class KotlinFragment : Fragment() {
 
@@ -16,13 +17,16 @@ class KotlinFragment : Fragment() {
 
     private lateinit var viewModel: KotlinViewModel
 
-    private var binding: KotlinFragmentBinding? = null
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+//        val binding = DataBindingUtil.inflate<KotlinFragmentBinding>(
+//            inflater,
+//            R.layout.kotlin_fragment,
+//            container,
+//            false
+//        )
         val binding = KotlinFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

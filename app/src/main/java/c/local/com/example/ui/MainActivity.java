@@ -21,8 +21,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import c.local.com.example.R;
-import c.local.com.example.data.Pokemon;
-import c.local.com.example.model.Product;
 
 public class MainActivity extends AppCompatActivity {
 	@Override
@@ -32,36 +30,9 @@ public class MainActivity extends AppCompatActivity {
 		// Add product list fragment if this is first creation
 		if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, MainFragment.newInstance(), PokemonListFragment.TAG).commit();
+					.add(R.id.fragment_container, MainFragment.newInstance(), MainFragment.TAG).commit();
 		}
 	}
 
-	/**
-	 * Shows the product detail fragment
-	 */
-	public void show(Product product) {
-
-		ProductFragment productFragment = ProductFragment.forProduct(product.getId());
-
-		getSupportFragmentManager()
-				.beginTransaction()
-				.addToBackStack("product")
-				.replace(R.id.fragment_container,
-						productFragment, null).commit();
-	}
-
-	/**
-	 * Shows the product detail fragment
-	 */
-	public void showPokemon(Pokemon pokemon) {
-
-		ProductFragment productFragment = ProductFragment.forProduct(pokemon.getId());
-
-		getSupportFragmentManager()
-				.beginTransaction()
-				.addToBackStack("product")
-				.replace(R.id.fragment_container,
-						productFragment, null).commit();
-	}
 
 }

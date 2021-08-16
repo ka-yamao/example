@@ -18,6 +18,8 @@ import c.local.com.example.databinding.MainFragmentBinding;
 
 public class MainFragment extends Fragment {
 
+	public static final String TAG = MainFragment.class.getSimpleName();
+
 	// インスタンス
 	public static MainFragment newInstance() {
 		return new MainFragment();
@@ -70,7 +72,7 @@ public class MainFragment extends Fragment {
 				case 0:
 					return RetrofitFragment.newInstance();
 				case 1:
-				return RxJavaFragment.newInstance();
+					return RxJavaFragment.newInstance();
 				case 2:
 					return KotlinFragment.Companion.newInstance();
 				case 3:

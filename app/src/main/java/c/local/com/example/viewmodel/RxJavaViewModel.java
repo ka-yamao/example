@@ -36,15 +36,8 @@ public class RxJavaViewModel extends AndroidViewModel {
 	// API
 	private PokeAPIService mApiService;
 
-	public enum ButtonType {
-		PROCESS,
-		SUBJECT,
-		ERROR,
-		BASH
-	}
-
 	public RxJavaViewModel(@NonNull Application application,
-							 @NonNull SavedStateHandle savedStateHandle) {
+						   @NonNull SavedStateHandle savedStateHandle) {
 		super(application);
 		mLogListLiveData = new MediatorLiveData<>();
 		mLogListLiveData.setValue(new ArrayList<>());
@@ -79,7 +72,6 @@ public class RxJavaViewModel extends AndroidViewModel {
 	}
 
 
-
 	public void fetch(int index) {
 
 		log("index :" + index);
@@ -97,19 +89,19 @@ public class RxJavaViewModel extends AndroidViewModel {
 				mPublishSubject.onNext(new PokemonListInfo(0, "sdss"));
 				break;
 			case 3:
-				for (int i = 0; i < 10 ; i++) {
+				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishProcessor.onNext(new PokemonListInfo());
 				}
 				break;
 			case 4:
-				for (int i = 0; i < 10 ; i++) {
+				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishSubject.onNext(new PokemonListInfo());
 				}
 				break;
 			case 999:
-				for (int i = 0; i < 10 ; i++) {
+				for (int i = 0; i < 10; i++) {
 					mLogListLiveData.postValue(new ArrayList<>());
 				}
 				break;
@@ -119,6 +111,7 @@ public class RxJavaViewModel extends AndroidViewModel {
 	public MediatorLiveData<List<String>> getLogListLiveData() {
 		return mLogListLiveData;
 	}
+
 	public void log(String log) {
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("hh時mm分ss秒SSSミリ秒 ");
