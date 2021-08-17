@@ -84,11 +84,6 @@ public class RetrofitFragment extends Fragment {
 		});
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-	}
-
 	private void subscribeUi(LiveData<List<Pokemon>> liveData) {
 		// Update the list when the data changes
 		liveData.observe(getViewLifecycleOwner(), pokemonList -> {
@@ -102,6 +97,11 @@ public class RetrofitFragment extends Fragment {
 			mBinding.executePendingBindings();
 			mBinding.refresh.setRefreshing(false);
 		});
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 		// １ページ名を取得
 		mViewModel.fetch(false);
 	}

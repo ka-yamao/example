@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools">
+
 	<data>
 
 		<import type="android.view.View" />
@@ -9,78 +10,85 @@
 			name="retrofitViewModel"
 			type="c.local.com.example.viewmodel.RxJavaViewModel" />
 
-		<variable name="callback"
-			type="c.local.com.example.ui.RxJavaFragment.ButtonClickCallback"/>
+		<variable
+			name="callback"
+			type="c.local.com.example.ui.RxJavaFragment.ButtonClickCallback" />
 	</data>
-
 
 
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical">
-			<LinearLayout
+
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			tools:context=".ui.RxJavaFragment">
-				<Button
-					android:id="@+id/clear"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(999)}"
-					android:text="Clear" />
-			</LinearLayout>
-			<LinearLayout
-				android:layout_width="match_parent"
+
+			<Button
+				android:id="@+id/clear"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-				tools:context=".ui.RxJavaFragment">
-				<Button
-					android:id="@+id/processor"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(0)}"
-					android:text="Proc" />
-				<Button
-					android:id="@+id/subject"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(1)}"
-					android:text="Subj" />
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(999)}"
+				android:text="Clear" />
+		</LinearLayout>
 
-				<Button
-					android:id="@+id/error"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(2)}"
-					android:text="error" />
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			tools:context=".ui.RxJavaFragment">
 
-				<Button
-					android:id="@+id/p_bash"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(3)}"
-					android:text="p bash" />
-				<Button
-					android:id="@+id/s_bash"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:onClick="@{() ->  callback.onClick(4)}"
-					android:text="s bash" />
+			<Button
+				android:id="@+id/processor"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(0)}"
+				android:text="Proc" />
 
-			</LinearLayout>
+			<Button
+				android:id="@+id/subject"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(1)}"
+				android:text="Subj" />
 
-	<ListView
-		android:id="@+id/list"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent" />
+
+			<Button
+				android:id="@+id/p_bash"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(2)}"
+				android:text="p bash" />
+
+			<Button
+				android:id="@+id/s_bash"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(3)}"
+				android:text="s bash" />
+
+			<Button
+				android:id="@+id/error"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  callback.onClick(4)}"
+				android:text="error" />
+
+		</LinearLayout>
+
+		<ListView
+			android:id="@+id/list"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent" />
 
 	</LinearLayout>
 </layout>

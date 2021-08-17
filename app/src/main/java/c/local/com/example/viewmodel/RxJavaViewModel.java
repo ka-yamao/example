@@ -98,24 +98,25 @@ public class RxJavaViewModel extends AndroidViewModel {
 				mPublishSubject.onNext(new PokemonListInfo());
 				break;
 			case 2:
-				// エラー
-				log("onNext");
-				mPublishSubject.onNext(new PokemonListInfo(0, "sdss"));
-				break;
-			case 3:
 				// PublishProcessor 10回連打
 				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishProcessor.onNext(new PokemonListInfo());
 				}
 				break;
-			case 4:
+			case 3:
 				// PublishSubject 10回連打
 				for (int i = 0; i < 10; i++) {
 					log("onNext " + i);
 					mPublishSubject.onNext(new PokemonListInfo());
 				}
 				break;
+			case 4:
+				// エラー
+				log("onNext");
+				mPublishSubject.onNext(new PokemonListInfo(0, "sdss"));
+				break;
+
 			case 999:
 				// ログのクリア
 				mLogListLiveData.postValue(new ArrayList<>());
