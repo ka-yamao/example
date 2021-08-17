@@ -18,10 +18,12 @@ package c.local.com.example;
 
 import android.app.Application;
 
+import dagger.hilt.android.HiltAndroidApp;
+
 /**
  * Android Application class. Used for accessing singletons.
  */
-
+@HiltAndroidApp
 public class BasicApp extends Application {
 
 	private AppExecutors mAppExecutors;
@@ -39,7 +41,7 @@ public class BasicApp extends Application {
 		app = this;
 		mAppExecutors = new AppExecutors();
 	}
-	
+
 	public PokeAPIService getApi() {
 		return NetworkModule.providePokemonApiService();
 	}
