@@ -32,9 +32,9 @@ public class MainFragment extends Fragment {
 	// データバインディング
 	private MainFragmentBinding mBinding;
 
-	static final int PAGE_COUNT = 4;
+	static final int PAGE_COUNT = 5;
 	// タブのタイトル
-	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Blank"};
+	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Hilt", "Blank"};
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -76,6 +76,7 @@ public class MainFragment extends Fragment {
 				case 2:
 					return KotlinFragment.Companion.newInstance();
 				case 3:
+					return HiltFragment.newInstance();
 				default:
 					return new BlankFragment();
 			}
