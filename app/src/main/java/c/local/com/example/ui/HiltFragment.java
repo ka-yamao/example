@@ -10,11 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
-import c.local.com.example.viewmodel.HiltViewModel;
+import c.local.com.example.viewmodel.HiltTestViewModel;
 
 public class HiltFragment extends Fragment {
 
-	private HiltViewModel mViewModel;
+	private HiltTestViewModel mViewModel;
 
 	public static HiltFragment newInstance() {
 		return new HiltFragment();
@@ -30,7 +30,7 @@ public class HiltFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		mViewModel = new ViewModelProvider(this).get(HiltViewModel.class);
+		mViewModel = new ViewModelProvider(this).get(HiltTestViewModel.class);
 	}
 
 }
