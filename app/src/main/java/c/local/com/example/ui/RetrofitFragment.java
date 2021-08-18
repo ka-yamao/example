@@ -17,6 +17,8 @@
 package c.local.com.example.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +84,8 @@ public class RetrofitFragment extends Fragment {
 				mViewModel.fetch(true);
 			}
 		});
+		// レコメンドのデータを取得
+		new Handler(Looper.getMainLooper()).post(() -> mViewModel.fetch(false));
 	}
 
 	private void subscribeUi(LiveData<List<Pokemon>> liveData) {
@@ -97,13 +101,6 @@ public class RetrofitFragment extends Fragment {
 			mBinding.executePendingBindings();
 			mBinding.refresh.setRefreshing(false);
 		});
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		// １ページ名を取得
-		mViewModel.fetch(false);
 	}
 
 	@Override

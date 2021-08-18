@@ -1,6 +1,8 @@
 package c.local.com.example.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,6 +55,10 @@ class KotlinFragment : Fragment() {
         binding.refresh.setOnRefreshListener {
             viewModel.fetch(false)
         }
+        // １ページ名を取得
+        viewModel.fetch(false)
+        // レコメンドのデータを取得
+        Handler(Looper.getMainLooper()).post { viewModel.fetch(false) }
     }
 
     private fun subscribeUi(liveData: LiveData<List<Pokemon>>) {
@@ -66,12 +72,6 @@ class KotlinFragment : Fragment() {
                 binding.refresh.isRefreshing = false
                 binding.executePendingBindings()
             })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // １ページ名を取得
-        viewModel.fetch(false)
     }
 
     private val mPokemonClickCallback =
