@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
+import c.local.com.example.viewmodel.HiltViewModel;
 
 public class HiltFragment extends Fragment {
 
