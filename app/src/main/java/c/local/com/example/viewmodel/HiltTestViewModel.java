@@ -2,7 +2,6 @@ package c.local.com.example.viewmodel;
 
 import java.util.List;
 
-import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import c.local.com.example.Repository;
@@ -15,7 +14,7 @@ public class HiltTestViewModel extends ViewModel {
 
 	private MutableLiveData<List<Pokemon>> pokemonList = new MutableLiveData<>();
 
-	@ViewModelInject
+	// @ViewModelInject
 	public HiltTestViewModel(Repository repository) {
 		this.repository = repository;
 	}
