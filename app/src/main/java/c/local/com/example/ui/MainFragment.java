@@ -32,7 +32,7 @@ public class MainFragment extends Fragment {
 	// データバインディング
 	private MainFragmentBinding mBinding;
 
-	static final int PAGE_COUNT = 5;
+	static final int PAGE_COUNT = 4;
 	// タブのタイトル
 	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Hilt", "Blank"};
 
@@ -55,7 +55,7 @@ public class MainFragment extends Fragment {
 		// タブレイアウトを設定
 		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText(titles[position])).attach();
 		// デフォルトページ
-		mBinding.pager.setCurrentItem(0);
+		mBinding.pager.setCurrentItem(3);
 	}
 
 	/**

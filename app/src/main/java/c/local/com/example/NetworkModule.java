@@ -3,10 +3,10 @@ package c.local.com.example;
 
 import com.squareup.moshi.Moshi;
 
-import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkModule {
@@ -23,7 +23,7 @@ public class NetworkModule {
 		return new Retrofit.Builder()
 				.baseUrl("https://pokeapi.co/api/v2/")                    // ベースURLの設定
 				.addConverterFactory(MoshiConverterFactory.create(moshi)) // JSON パーサーに Moshi を設定
-				.addCallAdapterFactory(RxJava3CallAdapterFactory.createAsync()) // Rxjava を利用するので設定
+				.addCallAdapterFactory(RxJava3CallAdapterFactory.create()) // Rxjava を利用するので設定
 				.client(createHttpClient())                               // HTTPクライアントを設定
 				.build()
 				.create(PokeAPIService.class);    // APIのインターフェースを設定
