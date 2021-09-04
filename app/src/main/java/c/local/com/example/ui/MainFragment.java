@@ -55,7 +55,7 @@ public class MainFragment extends Fragment {
 		// タブレイアウトを設定
 		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText(titles[position])).attach();
 		// デフォルトページ
-		mBinding.pager.setCurrentItem(0);
+		mBinding.pager.setCurrentItem(3);
 	}
 
 	/**

@@ -1,14 +1,24 @@
-package c.local.com.example;
+package c.local.com.example.di;
 
 
 import com.squareup.moshi.Moshi;
 
+import javax.inject.Singleton;
+
+import c.local.com.example.DLog;
+import c.local.com.example.PokeAPIService;
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ApplicationComponent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
+@Module
+@InstallIn(ApplicationComponent.class)
 public class NetworkModule {
 	public static final String TAG = NetworkModule.class.getSimpleName();
 
@@ -17,6 +27,8 @@ public class NetworkModule {
 	 *
 	 * @return PokeAPIService
 	 */
+	@Provides
+	@Singleton
 	public static PokeAPIService providePokemonApiService() {
 
 		Moshi moshi = new Moshi.Builder().build();

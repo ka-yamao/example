@@ -18,6 +18,7 @@ package c.local.com.example;
 
 import android.app.Application;
 
+import c.local.com.example.di.NetworkModule;
 import dagger.hilt.android.HiltAndroidApp;
 
 /**
