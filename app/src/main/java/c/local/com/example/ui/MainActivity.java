@@ -20,19 +20,27 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+
+	private MainViewModel mMainViewModel;
+
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+
+		mMainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+
 		// Add product list fragment if this is first creation
 		if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, MainFragment.newInstance(), MainFragment.TAG).commit();
+					.add(R.id.fragment_container, new MainFragment(), MainFragment.TAG).commit();
 		}
 	}
 

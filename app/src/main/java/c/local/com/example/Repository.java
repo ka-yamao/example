@@ -1,13 +1,10 @@
 package c.local.com.example;
 
 
-import java.util.List;
-
 import javax.inject.Inject;
 
-import androidx.lifecycle.LiveData;
-import c.local.com.example.data.Pokemon;
-import c.local.com.example.db.PokeDao;
+import c.local.com.example.model.PokemonResponse;
+import io.reactivex.rxjava3.core.Observable;
 
 /**
  * Created by Abhinav Singh on 17,June,2020
@@ -15,29 +12,15 @@ import c.local.com.example.db.PokeDao;
 
 public class Repository {
 
-    private PokeDao pokeDao;
     private PokeApiService apiService;
 
     @Inject
-    public Repository(PokeDao pokeDao, PokeApiService apiService) {
-        this.pokeDao = pokeDao;
+    public Repository(PokeApiService apiService) {
         this.apiService = apiService;
     }
 
-
-    public void insertPokemon(Pokemon pokemon){
-        pokeDao.insertPokemon(pokemon);
+    public Observable<PokemonResponse> getPokemons(){
+        return apiService.getPokemons();
     }
 
-    public void deletePokemon(String pokemonName){
-        pokeDao.deletePokemon(pokemonName);
-    }
-
-    public void deleteAll(){
-        pokeDao.deleteAll();
-    }
-
-    public LiveData<List<Pokemon>> getFavoritePokemon(){
-        return pokeDao.getFavoritePokemons();
-    }
 }

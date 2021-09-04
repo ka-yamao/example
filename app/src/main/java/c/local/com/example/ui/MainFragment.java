@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
 import c.local.com.example.databinding.MainFragmentBinding;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -37,7 +36,6 @@ public class MainFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 							 @Nullable Bundle savedInstanceState) {
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false);
-		mBinding.setLifecycleOwner(this);
 		return mBinding.getRoot();
 	}
 
@@ -46,7 +44,7 @@ public class MainFragment extends Fragment {
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		// ViewModel
-		mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+		// mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 	}
 }
 
