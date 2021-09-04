@@ -15,10 +15,6 @@ public class HiltTestViewModel extends ViewModel {
 
 	private MutableLiveData<List<Pokemon>> pokemonList = new MutableLiveData<>();
 
-//	public HiltTestViewModel() {
-//
-//	}
-
 	@ViewModelInject
 	public HiltTestViewModel(Repository repository) {
 		this.repository = repository;

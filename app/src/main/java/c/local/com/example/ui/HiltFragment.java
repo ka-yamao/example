@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
 import c.local.com.example.viewmodel.HiltTestViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -32,7 +33,7 @@ public class HiltFragment extends Fragment {
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		// TODO ↓ エラーになる。 java.lang.RuntimeException: Cannot create an instance of class c.local.com.example.viewmodel.HiltTestViewModel
-		// mViewModel = new ViewModelProvider(this).get(HiltTestViewModel.class);
+		mViewModel = new ViewModelProvider(this).get(HiltTestViewModel.class);
 	}
 
 }
