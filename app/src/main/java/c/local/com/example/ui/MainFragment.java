@@ -5,17 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.tabs.TabLayoutMediator;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 import c.local.com.example.R;
 import c.local.com.example.databinding.MainFragmentBinding;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class MainFragment extends Fragment {
 
 	public static final String TAG = MainFragment.class.getSimpleName();
@@ -27,19 +26,18 @@ public class MainFragment extends Fragment {
 
 	// ViewModel
 	private MainViewModel mViewModel;
-	// ページアダプター
-	CollectionPagerAdapter collectionPagerAdapter;
 	// データバインディング
 	private MainFragmentBinding mBinding;
 
-	static final int PAGE_COUNT = 4;
+	static final int PAGE_COUNT = 1;
 	// タブのタイトル
-	String[] titles = {"Retrofit", "RxJava", "Kotlin", "Hilt", "Blank"};
+	String[] titles = {"Hilt"};
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 							 @Nullable Bundle savedInstanceState) {
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false);
+		mBinding.setLifecycleOwner(this);
 		return mBinding.getRoot();
 	}
 
@@ -49,44 +47,6 @@ public class MainFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		// ViewModel
 		mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-		// ページアダプター
-		collectionPagerAdapter = new CollectionPagerAdapter(this);
-		mBinding.pager.setAdapter(collectionPagerAdapter);
-		// タブレイアウトを設定
-		new TabLayoutMediator(mBinding.tabLayout, mBinding.pager, (tab, position) -> tab.setText(titles[position])).attach();
-		// デフォルトページ
-		mBinding.pager.setCurrentItem(3);
-	}
-
-	/**
-	 * ページアダプター
-	 */
-	class CollectionPagerAdapter extends FragmentStateAdapter {
-		public CollectionPagerAdapter(Fragment f) {
-			super(f);
-		}
-
-		@Override
-		public Fragment createFragment(int position) {
-			switch (position) {
-				case 0:
-					return RetrofitFragment.newInstance();
-				case 1:
-					return RxJavaFragment.newInstance();
-				case 2:
-					return KotlinFragment.Companion.newInstance();
-				case 3:
-					return HiltFragment.newInstance();
-				default:
-					return new BlankFragment();
-			}
-
-		}
-
-		@Override
-		public int getItemCount() {
-			return PAGE_COUNT;
-		}
 	}
 }
 

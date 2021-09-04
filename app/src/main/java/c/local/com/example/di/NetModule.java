@@ -2,7 +2,7 @@ package c.local.com.example.di;
 
 import javax.inject.Singleton;
 
-import c.local.com.example.PokeAPIService;
+import c.local.com.example.PokeApiService;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
@@ -20,12 +20,12 @@ public class NetModule {
 
 	@Provides
 	@Singleton
-	public static PokeAPIService providePokemonApiService() {
+	public static PokeApiService providePokemonApiService() {
 
 		return new Retrofit.Builder()
 				.baseUrl(" https://pokeapi.co/api/v2/")
 				.addCallAdapterFactory(RxJava3CallAdapterFactory.create())
 				.build()
-				.create(PokeAPIService.class);
+				.create(PokeApiService.class);
 	}
 }
