@@ -39,8 +39,8 @@ public class HiltViewModel extends ViewModel {
 	/**
 	 * ポケモンリストの取得、追加読み込み
 	 */
-	public void fetch() {
-		mRepository.fetch(new PokemonListInfo());
+	public void fetch(int code) {
+		mRepository.fetch(code);
 	}
 
 	public LiveData<List<Pokemon>> getPokemonListLiveData() {

@@ -1,5 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
 
 	<data>
 
@@ -9,40 +10,35 @@
 			name="hiltViewModel"
 			type="c.local.com.example.viewmodel.HiltViewModel" />
 
-		<variable
-			name="isLoading"
-			type="boolean" />
-
 	</data>
 
 	<LinearLayout
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/cardview_light_background"
-		android:orientation="vertical">
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		tools:context=".ui.RxJavaFragment">
 
-		<ProgressBar
-			android:id="@+id/progressBar"
-			style="?android:attr/progress"
-			android:layout_width="30dp"
-			android:layout_height="30dp"
-			android:layout_marginVertical="50dp"
-			android:layout_gravity="center"
-			android:visibility="@{isLoading ?  View.VISIBLE : View.GONE}" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:onClick="@{() ->  hiltViewModel.fetch(200)}"
+			android:text="200" />
 
-		<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-			android:id="@+id/refresh"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:onClick="@{() ->  hiltViewModel.fetch(400)}"
+			android:text="400" />
 
-			<androidx.recyclerview.widget.RecyclerView
-				android:id="@+id/pokemon_list"
-				android:contentDescription="@string/cd_products_list"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				app:layoutManager="LinearLayoutManager"
-				android:visibility="@{isLoading ?  View.GONE : View.VISIBLE}" />
 
-		</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:onClick="@{() ->  hiltViewModel.fetch(500)}"
+			android:text="500" />
+
 	</LinearLayout>
 </layout>

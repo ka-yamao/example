@@ -11,4 +11,5 @@ public interface PokeAPIService {
 
 	@GET("pokemon/")
 	Observable<PokemonResponse> getPokemons(@QueryMap Map<String, String> query);
+
 }

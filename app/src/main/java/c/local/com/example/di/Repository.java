@@ -1,6 +1,9 @@
 package c.local.com.example.di;
 
 
+import android.util.Log;
+import android.util.Pair;
+
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +12,7 @@ import javax.inject.Inject;
 
 import androidx.lifecycle.MediatorLiveData;
 import c.local.com.example.DLog;
-import c.local.com.example.PokeAPIService;
+import c.local.com.example.HttpBinService;
 import c.local.com.example.data.Pokemon;
 import c.local.com.example.data.PokemonListInfo;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -26,16 +29,16 @@ public class Repository {
 
     public static final String TAG = Repository.class.getSimpleName();
     // API
-    private PokeAPIService mApiService;
+    private HttpBinService mHttpBinService;
 
     // 検索のサブジェクト
-    private PublishSubject<PokemonListInfo> mPublishSubject;
+    private PublishSubject<Pair<String,String>> mPublishSubject;
     // 検索実行のプロセル管理
-    public PublishProcessor<PokemonListInfo> mPublishProcessor;
+    public PublishProcessor<Pair<String,String>> mPublishProcessor;
 
     @Inject
-    public Repository(PokeAPIService apiService) {
-        mApiService = apiService;
+    public Repository(HttpBinService apiService) {
+        mHttpBinService = apiService;
         mPublishSubject = PublishSubject.create();
         mPublishProcessor = PublishProcessor.create();
         mPublishProcessor.onBackpressureLatest().observeOn(Schedulers.from(Executors.newCachedThreadPool()), false, 1).subscribe(p -> {
@@ -60,38 +63,32 @@ public class Repository {
                 // 入出力用のスレッド
                 .subscribeOn(Schedulers.io())
                 // 非同期の解決順で並び、APIで Observable<PokemonResponse> を取得
-                .concatMap(info -> {
-                    return mApiService.getPokemons(info.toQueryMap());
+                .concatMap(pair -> {
+                  return  mHttpBinService.getError(pair.first, pair.second);
                 }, 1)
                 // メインスレッド
                 .observeOn(AndroidSchedulers.mainThread())
                 // サブスクライブ リストを生成して、LiveData へ設定
                 .subscribe(result -> {
-                            // ポケモンのリスト作成
-                            List<Pokemon> list = pokemonList.getValue();
-                            if (result.previous == null) {
-                                list = result.toPokemonList();
-                            } else {
-                                list.addAll(result.toPokemonList());
-                            }
-                            // ポケモンリストを LiveDataへ設定 ※メインスレッドなので setValue
-                            pokemonList.setValue(list);
-                            // リストのページ情報
-                            PokemonListInfo info = new PokemonListInfo(result.count, result.next);
-                            // リストのページ情報を LiveDataへ設定 ※メインスレッドなので setValue
-                            pokemonListInfo.setValue(info);
+                            Log.d(TAG, result.origin);
                         },
                         error -> {
-                            // ※省略
+                            Log.d(TAG, error.toString());
                         }, () -> {
-                            // ※省略
+                            Log.d(TAG, "onComplete");
                         });
     }
 
-    public void fetch(PokemonListInfo pokemonListInfo) {
-        // onNext で ページ情報を流す
-        mPublishSubject.onNext(pokemonListInfo);
-        // Subject だけで大丈夫そう
-        // mPublishProcessor.onNext(page);
+    public void fetch(int c) {
+        String path;
+        String code;
+        if (c == 200) {
+            path = "ip";
+            code = "";
+        } else {
+            path = "status";
+            code = "" + c;
+        }
+        mPublishSubject.onNext(new Pair<>(path, code));
     }
 }
