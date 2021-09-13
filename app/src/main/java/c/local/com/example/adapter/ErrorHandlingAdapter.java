@@ -22,9 +22,12 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.Executor;
 
 import androidx.annotation.Nullable;
+import c.local.com.example.model.Ip;
+import c.local.com.example.model.NetworkOfflineException;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Callback;
@@ -38,181 +41,200 @@ import retrofit2.http.GET;
  * version whose callback has more granular methods.
  */
 public final class ErrorHandlingAdapter {
-  /** A callback which offers granular callbacks for various conditions. */
-  interface MyCallback<T> {
-    /** Called for [200, 300) responses. */
-    void success(Response<T> response);
-    /** Called for 401 responses. */
-    void unauthenticated(Response<?> response);
-    /** Called for [400, 500) responses, except 401. */
-    void clientError(Response<?> response);
-    /** Called for [500, 600) response. */
-    void serverError(Response<?> response);
-    /** Called for network errors while making the call. */
-    void networkError(IOException e);
-    /** Called for unexpected errors while making the call. */
-    void unexpectedError(Throwable t);
-  }
+	/**
+	 * A callback which offers granular callbacks for various conditions.
+	 */
+	public interface MyCallback<T> {
+		/**
+		 * Called for [200, 300) responses.
+		 */
+		void success(Response<T> response);
 
-  interface MyCall<T> {
-    void cancel();
+		/**
+		 * Called for 401 responses.
+		 */
+		void unauthenticated(Response<?> response);
 
-    void enqueue(MyCallback<T> callback);
+		/**
+		 * Called for [400, 500) responses, except 401.
+		 */
+		void clientError(Response<?> response);
 
-    MyCall<T> clone();
+		/**
+		 * Called for [500, 600) response.
+		 */
+		void serverError(Response<?> response);
 
-    // Left as an exercise for the reader...
-    // TODO MyResponse<T> execute() throws MyHttpException;
-  }
+		/**
+		 * Called for network errors while making the call.
+		 */
+		void networkError(IOException e);
 
-  public static class ErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
-    @Override
-    public @Nullable
-    CallAdapter<?, ?> get(
-            Type returnType, Annotation[] annotations, Retrofit retrofit) {
-      if (getRawType(returnType) != MyCall.class) {
-        return null;
-      }
-      if (!(returnType instanceof ParameterizedType)) {
-        throw new IllegalStateException(
-            "MyCall must have generic type (e.g., MyCall<ResponseBody>)");
-      }
-      Type responseType = getParameterUpperBound(0, (ParameterizedType) returnType);
-      Executor callbackExecutor = retrofit.callbackExecutor();
-      return new ErrorHandlingCallAdapter<>(responseType, callbackExecutor);
-    }
+		/**
+		 * Called for unexpected errors while making the call.
+		 */
+		void unexpectedError(Throwable t);
+	}
 
-    private static final class ErrorHandlingCallAdapter<R> implements CallAdapter<R, MyCall<R>> {
-      private final Type responseType;
-      private final Executor callbackExecutor;
+	public interface MyCall<T> {
+		void cancel();
 
-      ErrorHandlingCallAdapter(Type responseType, Executor callbackExecutor) {
-        this.responseType = responseType;
-        this.callbackExecutor = callbackExecutor;
-      }
+		void enqueue(MyCallback<T> callback);
 
-      @Override
-      public Type responseType() {
-        return responseType;
-      }
+		MyCall<T> clone();
 
-      @Override
-      public MyCall<R> adapt(Call<R> call) {
-        return new MyCallAdapter<>(call, callbackExecutor);
-      }
-    }
-  }
+		// Left as an exercise for the reader...
+		// TODO MyResponse<T> execute() throws MyHttpException;
+	}
 
-  /** Adapts a {@link Call} to {@link MyCall}. */
-  static class MyCallAdapter<T> implements MyCall<T> {
-    private final Call<T> call;
-    private final Executor callbackExecutor;
+	public static class ErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
+		@Override
+		public @Nullable
+		CallAdapter<?, ?> get(
+				Type returnType, Annotation[] annotations, Retrofit retrofit) {
+			if (getRawType(returnType) != MyCall.class) {
+				return null;
+			}
+			if (!(returnType instanceof ParameterizedType)) {
+				throw new IllegalStateException(
+						"MyCall must have generic type (e.g., MyCall<ResponseBody>)");
+			}
+			Type responseType = getParameterUpperBound(0, (ParameterizedType) returnType);
+			Executor callbackExecutor = retrofit.callbackExecutor();
+			return new ErrorHandlingCallAdapter<>(responseType, callbackExecutor);
+		}
 
-    MyCallAdapter(Call<T> call, Executor callbackExecutor) {
-      this.call = call;
-      this.callbackExecutor = callbackExecutor;
-    }
+		private static final class ErrorHandlingCallAdapter<R> implements CallAdapter<R, MyCall<R>> {
+			private final Type responseType;
+			private final Executor callbackExecutor;
 
-    @Override
-    public void cancel() {
-      call.cancel();
-    }
+			ErrorHandlingCallAdapter(Type responseType, Executor callbackExecutor) {
+				this.responseType = responseType;
+				this.callbackExecutor = callbackExecutor;
+			}
 
-    @Override
-    public void enqueue(final MyCallback<T> callback) {
-      call.enqueue(
-          new Callback<T>() {
-            @Override
-            public void onResponse(Call<T> call, Response<T> response) {
-              // TODO if 'callbackExecutor' is not null, the 'callback' methods should be executed
-              // on that executor by submitting a Runnable. This is left as an exercise for the
-              // reader.
+			@Override
+			public Type responseType() {
+				return responseType;
+			}
 
-              int code = response.code();
-              if (code >= 200 && code < 300) {
-                callback.success(response);
-              } else if (code == 401) {
-                callback.unauthenticated(response);
-              } else if (code >= 400 && code < 500) {
-                callback.clientError(response);
-              } else if (code >= 500 && code < 600) {
-                callback.serverError(response);
-              } else {
-                callback.unexpectedError(new RuntimeException("Unexpected response " + response));
-              }
-            }
+			@Override
+			public MyCall<R> adapt(Call<R> call) {
+				return new MyCallAdapter<>(call, callbackExecutor);
+			}
+		}
+	}
 
-            @Override
-            public void onFailure(Call<T> call, Throwable t) {
-              // TODO if 'callbackExecutor' is not null, the 'callback' methods should be executed
-              // on that executor by submitting a Runnable. This is left as an exercise for the
-              // reader.
+	/**
+	 * Adapts a {@link Call} to {@link MyCall}.
+	 */
+	static class MyCallAdapter<T> implements MyCall<T> {
+		private final Call<T> call;
+		private final Executor callbackExecutor;
 
-              if (t instanceof IOException) {
-                callback.networkError((IOException) t);
-              } else {
-                callback.unexpectedError(t);
-              }
-            }
-          });
-    }
+		MyCallAdapter(Call<T> call, Executor callbackExecutor) {
+			this.call = call;
+			this.callbackExecutor = callbackExecutor;
+		}
 
-    @Override
-    public MyCall<T> clone() {
-      return new MyCallAdapter<>(call.clone(), callbackExecutor);
-    }
-  }
+		@Override
+		public void cancel() {
+			call.cancel();
+		}
 
-  interface HttpBinService {
-    @GET("/ip")
-    MyCall<Ip> getIp();
-  }
+		@Override
+		public void enqueue(final MyCallback<T> callback) {
+			call.enqueue(
+					new Callback<T>() {
+						@Override
+						public void onResponse(Call<T> call, Response<T> response) {
+							// TODO if 'callbackExecutor' is not null, the 'callback' methods should be executed
+							// on that executor by submitting a Runnable. This is left as an exercise for the
+							// reader.
 
-  static class Ip {
-    String origin;
-  }
+							int code = response.code();
+							if (code >= 200 && code < 300) {
+								callback.success(response);
+							} else if (code == 401) {
+								callback.unauthenticated(response);
+							} else if (code >= 400 && code < 500) {
+								callback.clientError(response);
+							} else if (code >= 500 && code < 600) {
+								callback.serverError(response);
+							} else {
+								callback.unexpectedError(new RuntimeException("Unexpected response " + response));
+							}
+						}
 
-  public static void main(String... args) {
-    Retrofit retrofit =
-        new Retrofit.Builder()
-            .baseUrl("http://httpbin.org")
-            .addCallAdapterFactory(new ErrorHandlingCallAdapterFactory())
-            .addConverterFactory(MoshiConverterFactory.create(new Moshi.Builder().build()))
-            .build();
+						@Override
+						public void onFailure(Call<T> call, Throwable t) {
+							// TODO if 'callbackExecutor' is not null, the 'callback' methods should be executed
+							// on that executor by submitting a Runnable. This is left as an exercise for the
+							// reader.
 
-    HttpBinService service = retrofit.create(HttpBinService.class);
-    MyCall<Ip> ip = service.getIp();
-    ip.enqueue(
-        new MyCallback<Ip>() {
-          @Override
-          public void success(Response<Ip> response) {
-            System.out.println("SUCCESS! " + response.body().origin);
-          }
+							if (t instanceof NetworkOfflineException) {
+								callback.networkError((NetworkOfflineException) t);
+							} else if (t instanceof SocketTimeoutException) {
+								callback.networkError((IOException) t);
+							} else {
+								callback.unexpectedError(t);
+							}
+						}
+					});
+		}
 
-          @Override
-          public void unauthenticated(Response<?> response) {
-            System.out.println("UNAUTHENTICATED");
-          }
+		@Override
+		public MyCall<T> clone() {
+			return new MyCallAdapter<>(call.clone(), callbackExecutor);
+		}
+	}
 
-          @Override
-          public void clientError(Response<?> response) {
-            System.out.println("CLIENT ERROR " + response.code() + " " + response.message());
-          }
+	interface HttpBinService {
+		@GET("/ip")
+		MyCall<Ip> getIp();
+	}
 
-          @Override
-          public void serverError(Response<?> response) {
-            System.out.println("SERVER ERROR " + response.code() + " " + response.message());
-          }
+	public static void main(String... args) {
+		Retrofit retrofit =
+				new Retrofit.Builder()
+						.baseUrl("http://httpbin.org")
+						.addCallAdapterFactory(new ErrorHandlingCallAdapterFactory())
+						.addConverterFactory(MoshiConverterFactory.create(new Moshi.Builder().build()))
+						.build();
 
-          @Override
-          public void networkError(IOException e) {
-            System.err.println("NETWORK ERROR " + e.getMessage());
-          }
+		HttpBinService service = retrofit.create(HttpBinService.class);
+		MyCall<Ip> ip = service.getIp();
+		ip.enqueue(
+				new MyCallback<Ip>() {
+					@Override
+					public void success(Response<Ip> response) {
+						System.out.println("SUCCESS! " + response.body().origin);
+					}
 
-          @Override
-          public void unexpectedError(Throwable t) {
-            System.err.println("FATAL ERROR " + t.getMessage());
-          }
-        });
-  }
+					@Override
+					public void unauthenticated(Response<?> response) {
+						System.out.println("UNAUTHENTICATED");
+					}
+
+					@Override
+					public void clientError(Response<?> response) {
+						System.out.println("CLIENT ERROR " + response.code() + " " + response.message());
+					}
+
+					@Override
+					public void serverError(Response<?> response) {
+						System.out.println("SERVER ERROR " + response.code() + " " + response.message());
+					}
+
+					@Override
+					public void networkError(IOException e) {
+						System.err.println("NETWORK ERROR " + e.getMessage());
+					}
+
+					@Override
+					public void unexpectedError(Throwable t) {
+						System.err.println("FATAL ERROR " + t.getMessage());
+					}
+				});
+	}
 }

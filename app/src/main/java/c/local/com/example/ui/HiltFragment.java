@@ -6,12 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import c.local.com.example.R;
-import c.local.com.example.adapter.PokemonAdapter;
 import c.local.com.example.databinding.HiltFragmentBinding;
 import c.local.com.example.viewmodel.HiltViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -25,30 +23,28 @@ public class HiltFragment extends Fragment {
 
 	private HiltViewModel mViewModel;
 
-	private PokemonAdapter mPokemonAdapter;
-
 	public static HiltFragment newInstance() {
 		return new HiltFragment();
 	}
 
 	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-							 @Nullable Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+
 		mBinding = DataBindingUtil.inflate(inflater, R.layout.hilt_fragment, container, false);
+
+		mViewModel = new ViewModelProvider(this).get(HiltViewModel.class);
+		mBinding.setLifecycleOwner(this);
+		mBinding.setHiltViewModel(mViewModel);
+
 		return mBinding.getRoot();
 
 	}
 
-
-	@Override
-	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		mViewModel = new ViewModelProvider(this).get(HiltViewModel.class);
-
-		// Adapter 初期化
-		mPokemonAdapter = new PokemonAdapter(null);
-		mBinding.setHiltViewModel(mViewModel);
-
-	}
 
 }

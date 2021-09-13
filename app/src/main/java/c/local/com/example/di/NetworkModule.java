@@ -1,16 +1,22 @@
 package c.local.com.example.di;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import com.squareup.moshi.Moshi;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
+import c.local.com.example.BasicApp;
 import c.local.com.example.DLog;
 import c.local.com.example.HttpBinService;
 import c.local.com.example.PokeAPIService;
 import c.local.com.example.adapter.ErrorHandlingAdapter;
+import c.local.com.example.model.NetworkOfflineException;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
@@ -74,11 +80,20 @@ public class NetworkModule {
 
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 		httpClient.connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
+		httpClient.connectTimeout(10, TimeUnit.SECONDS);
+		httpClient.readTimeout(10, TimeUnit.SECONDS);
+		httpClient.writeTimeout(10, TimeUnit.SECONDS);
+
 
 		httpClient.addInterceptor(chain -> {
 			Request original = chain.request();
 
 			DLog.d(TAG, original.url().toString());
+
+			// ネットワークチェック
+			if (!isNetworkAvailable(BasicApp.getApp())) {
+				throw new NetworkOfflineException();
+			}
 
 			//header設定
 			Request request = original.newBuilder()
@@ -92,5 +107,14 @@ public class NetworkModule {
 		});
 
 		return httpClient.build();
+	}
+
+
+	public static boolean isNetworkAvailable(Context context) {
+		ConnectivityManager cm =
+				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		return activeNetwork != null &&
+				activeNetwork.isConnectedOrConnecting();
 	}
 }

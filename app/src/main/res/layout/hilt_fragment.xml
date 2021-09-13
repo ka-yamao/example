@@ -1,6 +1,4 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<data>
 
@@ -15,30 +13,84 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		tools:context=".ui.RxJavaFragment">
+		android:orientation="vertical">
 
-		<Button
-			android:layout_width="wrap_content"
+		<TextView
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:onClick="@{() ->  hiltViewModel.fetch(200)}"
-			android:text="200" />
+			android:padding="20dp"
+			android:gravity="center"
+			android:textSize="20dp"
+			android:text="API テスト" />
 
-		<Button
-			android:layout_width="wrap_content"
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:onClick="@{() ->  hiltViewModel.fetch(400)}"
-			android:text="400" />
+			android:orientation="horizontal">
 
 
-		<Button
-			android:layout_width="wrap_content"
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(200)}"
+				android:text="200" />
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(400)}"
+				android:text="400" />
+
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(500)}"
+				android:text="500" />
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:onClick="@{() ->  hiltViewModel.fetch(500)}"
-			android:text="500" />
+			android:orientation="horizontal">
+
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(0)}"
+				android:text="Timeout" />
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(1)}"
+				android:text="Network" />
+
+
+			<Button
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="@{() ->  hiltViewModel.fetch(2)}"
+				android:text="UnKnow" />
+
+		</LinearLayout>
+
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="20dp"
+			android:gravity="center"
+			android:textSize="20dp"
+			android:text="@{hiltViewModel.liveData}" />
 
 	</LinearLayout>
 </layout>
