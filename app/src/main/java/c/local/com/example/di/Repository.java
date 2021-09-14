@@ -12,6 +12,7 @@ import c.local.com.example.DLog;
 import c.local.com.example.HttpBinService;
 import c.local.com.example.adapter.ErrorHandlingAdapter;
 import c.local.com.example.model.Ip;
+import c.local.com.example.model.RetrofitException;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -61,7 +62,7 @@ public class Repository {
 				// 入出力用のスレッド
 				.subscribeOn(Schedulers.io())
 				// 非同期の解決順で並び
-				.concatMap(num -> wrapObservableResult(num), 1)
+				.concatMap(num -> wrapObservable(num), 1)
 				// メインスレッド
 				.observeOn(AndroidSchedulers.mainThread())
 				// サブスクライブ リストを生成して、LiveData へ設定
@@ -72,6 +73,35 @@ public class Repository {
 
 	public void fetch(int c) {
 		mPublishSubject.onNext(c);
+	}
+
+	private Observable<String> wrapObservable(Integer i) {
+
+		return Observable.create(e -> {
+
+			Observable<Ip> observable;
+			if (i == 200) {
+				observable = mHttpBinService.getOK200("ip");
+			} else if (i == 400 || i == 500) {
+				observable = mHttpBinService.getErr("status", String.valueOf(i));
+			} else if (i == 0) {
+				observable = mHttpBinService.getTimeout();
+			} else if (i == 1) {
+				observable = mHttpBinService.getErr("status", String.valueOf(i));
+			} else if (i == 2) {
+				observable = mHttpBinService.getErr("stat", String.valueOf(i));
+			} else {
+				observable = mHttpBinService.getOK200("ip");
+			}
+			observable.subscribe(result -> {
+				e.onNext(result.origin);
+				e.onComplete();
+			}, error -> {
+				RetrofitException.Kind s = ((RetrofitException) error).getKind();
+				e.onNext(String.valueOf(s));
+				e.onComplete();
+			});
+		});
 	}
 
 	private Observable<String> wrapObservableResult(Integer i) {

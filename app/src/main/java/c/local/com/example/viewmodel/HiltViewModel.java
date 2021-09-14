@@ -31,10 +31,12 @@ public class HiltViewModel extends ViewModel {
 		return mLiveData;
 	}
 
-	/**
-	 * ポケモンリストの取得、追加読み込み
-	 */
 	public void fetch(int code) {
+		mLiveData.postValue("fetch");
+		mRepository.fetch(code);
+	}
+
+	public void fetchErr(int code) {
 		mLiveData.postValue("fetch");
 		mRepository.fetch(code);
 	}

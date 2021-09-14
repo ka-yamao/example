@@ -16,6 +16,7 @@ import c.local.com.example.DLog;
 import c.local.com.example.HttpBinService;
 import c.local.com.example.PokeAPIService;
 import c.local.com.example.adapter.ErrorHandlingAdapter;
+import c.local.com.example.adapter.RxErrorHandlingCallAdapterFactory;
 import c.local.com.example.model.NetworkOfflineException;
 import dagger.Module;
 import dagger.Provides;
@@ -65,7 +66,8 @@ public class NetworkModule {
 				.baseUrl("https://httpbin.org/")                    // ベースURLの設定
 				.addCallAdapterFactory(new ErrorHandlingAdapter.ErrorHandlingCallAdapterFactory())
 				.addConverterFactory(MoshiConverterFactory.create(new Moshi.Builder().build())) // JSON パーサーに Moshi を設定
-				.addCallAdapterFactory(RxJava3CallAdapterFactory.create()) // Rxjava を利用するので設定
+				// .addCallAdapterFactory(RxJava3CallAdapterFactory.create()) // Rxjava を利用するので設定
+				.addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create()) // Rxjava を利用するので設定
 				.client(createHttpClient())                               // HTTPクライアントを設定
 				.build()
 				.create(HttpBinService.class);    // APIのインターフェースを設定
@@ -80,9 +82,9 @@ public class NetworkModule {
 
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 		httpClient.connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
-		httpClient.connectTimeout(10, TimeUnit.SECONDS);
-		httpClient.readTimeout(10, TimeUnit.SECONDS);
-		httpClient.writeTimeout(10, TimeUnit.SECONDS);
+		httpClient.connectTimeout(5, TimeUnit.SECONDS);
+		httpClient.readTimeout(5, TimeUnit.SECONDS);
+		httpClient.writeTimeout(5, TimeUnit.SECONDS);
 
 
 		httpClient.addInterceptor(chain -> {
