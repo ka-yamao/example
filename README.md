@@ -24,6 +24,6 @@
 ### Android の Java プロジェクトにデータバインディング, LiveData, Kotlin, Rxjava, Retrofit を追加
 - https://github.com/ka-yamao/example/tree/3595
 
-
-
+### Android の スライダーと棒グラフ
+- https://github.com/ka-yamao/example/tree/3695
 
