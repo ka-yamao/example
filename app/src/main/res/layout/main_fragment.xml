@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".ui.main.MainFragment">
+
+	<com.c.local.myapplication.ui.main.BarGraph
+		android:id="@+id/barGraph"
+		android:layout_width="match_parent"
+		android:layout_height="100dp"
+		android:layout_marginHorizontal="20dp"
+		android:layout_marginBottom="-25dp"
+		app:graphValues="@array/graph_sample_data"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintBottom_toTopOf="@+id/slider"
+		/>
+
+	<com.google.android.material.slider.RangeSlider
+		android:id="@+id/slider"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:valueFrom="0.0"
+		android:valueTo="19.0"
+		android:stepSize="1.0"
+		app:values="@array/initial_slider_values"
+		app:trackColor="#177bcb"
+		app:trackColorActive="@color/black"
+		app:thumbRadius="15dp"
+		app:thumbColor="@color/white"
+		app:thumbStrokeColor="#177bcb"
+		app:thumbStrokeWidth="2dp"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintBottom_toBottomOf="parent"
+		/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

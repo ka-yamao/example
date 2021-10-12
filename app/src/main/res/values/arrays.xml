@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="initial_slider_values">
+		<item>0.0</item>
+		<item>19.0</item>
+	</array>
+	<array name="graph_sample_data">
+		<item>330</item>
+		<item>1156</item>
+		<item>2557</item>
+		<item>4137</item>
+		<item>5386</item>
+		<item>6677</item>
+		<item>7730</item>
+		<item>8369</item>
+		<item>10906</item>
+		<item>11184</item>
+		<item>10705</item>
+		<item>10150</item>
+		<item>9550</item>
+		<item>13477</item>
+		<item>9960</item>
+		<item>7181</item>
+		<item>5846</item>
+		<item>3656</item>
+		<item>2118</item>
+	</array>
+</resources>
