@@ -8,8 +8,5 @@
 		<attr name="activeColor" format="color" />
 		<attr name="inactiveColor" format="color" />
 	</declare-styleable>
-	<declare-styleable name="Themes">
-		<attr name="OriginalBarGraphView" format="reference" />
-	</declare-styleable>
 
 </resources>

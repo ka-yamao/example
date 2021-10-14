@@ -36,21 +36,19 @@ public class BarGraph extends View {
 	public BarGraph(@NonNull Context context) {
 		this(context, null);
 	}
+
 	public BarGraph(@NonNull Context context, @NonNull AttributeSet attrs) {
 		this(context,
 				attrs,
-				R.attr.OriginalBarGraphView);
+				0);
 	}
 
 	public BarGraph(@NonNull Context context, @NonNull AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		// xml 設定データ
-		TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BarGraphView, defStyleAttr, 0);
-		// グラフデータ
-		int arrId = typedArray.getResourceId(R.styleable.BarGraphView_graphValues, -1);
-		if (arrId > 0) {
-			mGraphValues = context.getResources().getIntArray(arrId);
-		}
+		TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BarGraphView, 0, 0);
+		// データ配列の初期化
+		mGraphValues = new int[]{};
 
 		// 下限インデックス
 		mMinIndex = typedArray.getInt(R.styleable.BarGraphView_minIndex, 0);
@@ -60,7 +58,7 @@ public class BarGraph extends View {
 			mMaxIndex = maxIndex;
 		} else if (mGraphValues.length > 0) {
 			// データが存在したら配列のサイズ - 1
-			mMaxIndex = mGraphValues.length -1;
+			mMaxIndex = mGraphValues.length - 1;
 		}
 		// 活性カラー
 		mActiveColor = typedArray.getColor(R.styleable.BarGraphView_activeColor, context.getColor(R.color.lightBlue));
@@ -69,13 +67,11 @@ public class BarGraph extends View {
 	}
 
 
-
 	/**
 	 * AddViewなんかで実際にviewが追加されたときに呼び出される
-	 *
 	 */
 	@Override
-	protected void onAttachedToWindow(){
+	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
 
 	}
@@ -83,7 +79,6 @@ public class BarGraph extends View {
 	/**
 	 * タテヨコの大きさを決める時に呼び出される
 	 * Viewの大きさを指定したい場合は、ここで指定
-	 *
 	 */
 	@Override
 	protected void onMeasure(int width, int height) {
@@ -93,7 +88,6 @@ public class BarGraph extends View {
 
 	/**
 	 * レイアウトを決める時に呼び出される
-	 *
 	 */
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -102,7 +96,6 @@ public class BarGraph extends View {
 
 	/**
 	 * 描画
-	 *
 	 */
 	@Override
 	public void onDraw(Canvas canvas) {
@@ -112,30 +105,47 @@ public class BarGraph extends View {
 		int height = this.getHeight();
 
 		Paint paint = new Paint();
-		// 色指定（アルファチャネル、赤、緑、青）
-		paint.setColor(getContext().getColor(R.color.lightBlue));
 		// データ数
 		int dataSize = mGraphValues.length;
-		// TODO 棒線との間に間隔を開けるので データ数 + 2(※この数値を上げると棒線の間隔が広くなる)
-		int splitNum = dataSize + 1;
+		// TODO 棒線との間に間隔を開けるので データ数 + X (※この数値を上げると棒線の間隔が広くなる)
+		int splitNum = dataSize + 2;
 		// 棒線の太さ
 		paint.setStrokeWidth((float) width / splitNum);
 		// 最大値
 		int maxValue = Arrays.stream(mGraphValues).reduce(Math::max).getAsInt();
 		float unit = (float) maxValue / height;
-
 		// データ数のループ
-		for(int i=0; i < mGraphValues.length; i++) {
+		for (int i = 0; i < mGraphValues.length; i++) {
 			// 棒線のスタート位置
 			final float startX = (width / splitNum / 2) + i * width / dataSize;
 			// 棒線の高さ計算
 			final float stopY = height - (mGraphValues[i] / unit);
 			// 高さ
 			final float startY = height;
-
+			// 棒線のカラー
+			if (i < mMinIndex || i > mMaxIndex) {
+				paint.setColor(mInactiveColor);
+			} else {
+				paint.setColor(mActiveColor);
+			}
+			// 線を引く
 			canvas.drawLine(startX, startY, startX, stopY, paint);
-			Log.d("★",startX+ "/"+ height+ "/"+ startX+ "/"+ stopY);
+
+			Log.d("★", startX + "/" + height + "/" + startX + "/" + stopY);
 		}
 	}
+
+	public void setGraphValues(int[] mGraphValues) {
+		this.mGraphValues = mGraphValues;
+	}
+
+	public void setMinIndex(int mMinIndex) {
+		this.mMinIndex = mMinIndex;
+	}
+
+	public void setMaxIndex(int mMaxIndex) {
+		this.mMaxIndex = mMaxIndex;
+	}
+
 }
 
