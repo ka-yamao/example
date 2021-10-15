@@ -10,5 +10,7 @@
 	<color name="lightBlue">#92ccf4</color>
 	<color name="grey20">#d5d5d5</color>
 	<color name="transparent">#00000000</color>
+	<color name="pinkishGrey">#bbbbbb</color>
+	<color name="waterBlueTwo">#177bcb</color>
 
 </resources>
