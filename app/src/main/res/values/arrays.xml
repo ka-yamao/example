@@ -24,8 +24,10 @@
 		<item>50,000円</item>
 		<item>70,000円</item>
 		<item>100,000円</item>
+		<item></item>
 	</array>
 	<array name="max_price_text">
+		<item></item>
 		<item>3,000円</item>
 		<item>4,000円</item>
 		<item>5,000円</item>

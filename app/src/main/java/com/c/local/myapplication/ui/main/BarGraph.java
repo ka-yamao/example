@@ -1,8 +1,10 @@
 package com.c.local.myapplication.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -97,6 +99,7 @@ public class BarGraph extends View {
 	/**
 	 * 描画
 	 */
+	@SuppressLint({"RestrictedApi", "ResourceAsColor"})
 	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -105,31 +108,40 @@ public class BarGraph extends View {
 		int height = this.getHeight();
 
 		Paint paint = new Paint();
+		Paint paintWhiteLine = new Paint();
+		paintWhiteLine.setStrokeWidth((float) 3.0);
+		paintWhiteLine.setColor(Color.WHITE);
 		// データ数
 		int dataSize = mGraphValues.length;
 		// TODO 棒線との間に間隔を開けるので データ数 + X (※この数値を上げると棒線の間隔が広くなる)
-		int splitNum = dataSize + 2;
+		int splitNum = dataSize;
 		// 棒線の太さ
-		paint.setStrokeWidth((float) width / splitNum);
+		paint.setStrokeWidth((float) width / dataSize);
 		// 最大値
 		int maxValue = Arrays.stream(mGraphValues).reduce(Math::max).getAsInt();
 		float unit = (float) maxValue / height;
 		// データ数のループ
 		for (int i = 0; i < mGraphValues.length; i++) {
 			// 棒線のスタート位置
-			final float startX = (width / splitNum / 2) + i * width / dataSize;
+			final float startX = (width / dataSize / 2) + i * width / dataSize;
+			final float whiteLine1StartX = i * width / dataSize;
+			final float whiteLine2StartX = (i + 1) * width / dataSize;
 			// 棒線の高さ計算
 			final float stopY = height - (mGraphValues[i] / unit);
 			// 高さ
 			final float startY = height;
 			// 棒線のカラー
-			if (i < mMinIndex || i > mMaxIndex) {
+			if (mMinIndex == mMaxIndex) {
+				paint.setColor(mInactiveColor);
+			} else if (i < mMinIndex || i >= mMaxIndex) {
 				paint.setColor(mInactiveColor);
 			} else {
 				paint.setColor(mActiveColor);
 			}
-			// 線を引く
-			canvas.drawLine(startX, startY, startX, stopY, paint);
+
+			canvas.drawLine(startX, startY, startX, stopY, paint); // 青、グレーの棒グラフの線
+			canvas.drawLine(whiteLine1StartX, startY, whiteLine1StartX, stopY, paintWhiteLine); // 間隔を空けるため、青、グレー棒線の左端に白い線
+			canvas.drawLine(whiteLine2StartX, startY, whiteLine2StartX, stopY, paintWhiteLine); // 間隔を空けるため、青、グレー棒線の右端に白い線
 
 			Log.d("★", startX + "/" + height + "/" + startX + "/" + stopY);
 		}

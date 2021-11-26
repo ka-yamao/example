@@ -23,7 +23,7 @@ public class MainViewModel extends AndroidViewModel {
 		super(application);
 		mGraphValues = new int[]{330, 1156, 2557, 4137, 5386, 6677, 7730, 8369, 10906, 11184, 10705, 10150, 9550, 13477, 9960, 7181, 5846, 3656, 2118};
 		mMinIndex = 0;
-		mMaxIndex = 18;
+		mMaxIndex = 19;
 
 		// テキストの表示
 		mMinTextArr = application.getResources().getStringArray(R.array.min_price_text);

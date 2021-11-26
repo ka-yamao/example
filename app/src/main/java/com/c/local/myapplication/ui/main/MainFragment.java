@@ -52,6 +52,14 @@ public class MainFragment extends Fragment {
 			Float[] values = slider.getValues().toArray(new Float[2]);
 			float min = values[0];
 			float max = values[1];
+			if (fromUser && min == 0.0 && max == 0.0) {
+				slider.setValues((float) 0.0, (float) 1.0);
+				return;
+			}
+			if (fromUser && min == 19.0 && max == 19.0) {
+				slider.setValues((float) 19.0, (float) 18.0);
+				return;
+			}
 			mViewModel.setMinIndex((int) min);
 			mViewModel.setMaxIndex((int) max);
 			// 棒グラフのカスタムViewはデータバインディングに対応してないので、値を設定
