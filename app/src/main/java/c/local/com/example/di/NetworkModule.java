@@ -7,12 +7,13 @@ import android.net.NetworkInfo;
 
 import com.squareup.moshi.Moshi;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import c.local.com.example.BasicApp;
-import c.local.com.example.DLog;
 import c.local.com.example.HttpBinService;
 import c.local.com.example.PokeAPIService;
 import c.local.com.example.adapter.ErrorHandlingAdapter;
@@ -22,9 +23,13 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ApplicationComponent;
+import okhttp3.Cache;
 import okhttp3.ConnectionPool;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -86,27 +91,23 @@ public class NetworkModule {
 		httpClient.readTimeout(5, TimeUnit.SECONDS);
 		httpClient.writeTimeout(5, TimeUnit.SECONDS);
 
+		// キャッシュ設定
+		// httpClient.networkInterceptors().add(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+		File httpCacheDirectory = new File(BasicApp.getApp().getCacheDir(), "poke");
+		int cacheSize = 20 * 1024; // 10 MiB
+		Cache cache = new Cache(httpCacheDirectory, cacheSize);
 
-		httpClient.addInterceptor(chain -> {
-			Request original = chain.request();
+		// add cache to the client
+		// httpClient
+		HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+		logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
-			DLog.d(TAG, original.url().toString());
-
-			// ネットワークチェック
-			if (!isNetworkAvailable(BasicApp.getApp())) {
-				throw new NetworkOfflineException();
-			}
-
-			//header設定
-			Request request = original.newBuilder()
-					.header("Accept", "application/json")
-					.method(original.method(), original.body())
-					.build();
-
-			okhttp3.Response response = chain.proceed(request);
-
-			return response;
-		});
+		httpClient
+				.cache(cache)
+				.addInterceptor(logging)
+				.addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+		// .addNetworkInterceptor(logging)
+		// .addInterceptor();
 
 		return httpClient.build();
 	}
@@ -119,4 +120,50 @@ public class NetworkModule {
 		return activeNetwork != null &&
 				activeNetwork.isConnectedOrConnecting();
 	}
+
+	public static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+
+			// ネットワークチェック
+			if (!isNetworkAvailable(BasicApp.getApp())) {
+				throw new NetworkOfflineException();
+			}
+			// リクエスト
+			Request original = chain.request();
+			Request request = original.newBuilder()
+					.removeHeader("Pragma")
+					.removeHeader("Cache-Control")
+					.header("Cache-Control", "public, max-age=60")
+					.build();
+			Response originalResponse = chain.proceed(request);
+
+			// レスポンス
+			Response response = originalResponse.newBuilder()
+					.removeHeader("Pragma")
+					.removeHeader("Cache-Control")
+					.header("Cache-Control", "public, max-age=60")
+					// .header("Cache-Control", "public, only-if-cached, max-stale=180")
+					.build();
+
+			return response;
+		}
+	};
+
+	public static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR_FIRST = chain -> {
+		Request original = chain.request();
+
+		// DLog.d(TAG, original.url().toString());
+
+
+		//header設定
+		Request request = original.newBuilder()
+				.header("Accept", "application/json")
+				.method(original.method(), original.body())
+				.build();
+
+		okhttp3.Response response = chain.proceed(request);
+
+		return response;
+	};
 }
