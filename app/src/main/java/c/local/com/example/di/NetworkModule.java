@@ -102,26 +102,20 @@ public class NetworkModule {
 		HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 		logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
+		// CacheInterceptor c = new CacheInterceptor(ca);
+		// new BridgeInterceptor()
 		httpClient
 				.cache(cache)
 				.addInterceptor(logging)
-				.addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+				.addNetworkInterceptor(NETWORK_INTERCEPTOR)
+				.addInterceptor(INTERCEPTOR);
 		// .addNetworkInterceptor(logging)
 		// .addInterceptor();
 
 		return httpClient.build();
 	}
 
-
-	public static boolean isNetworkAvailable(Context context) {
-		ConnectivityManager cm =
-				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		return activeNetwork != null &&
-				activeNetwork.isConnectedOrConnecting();
-	}
-
-	public static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+	public static final Interceptor INTERCEPTOR = new Interceptor() {
 		@Override
 		public Response intercept(Chain chain) throws IOException {
 
@@ -142,28 +136,40 @@ public class NetworkModule {
 			Response response = originalResponse.newBuilder()
 					.removeHeader("Pragma")
 					.removeHeader("Cache-Control")
-					.header("Cache-Control", "public, max-age=60")
-					// .header("Cache-Control", "public, only-if-cached, max-stale=180")
+					.header("Cache-Control", "public, max-age=6000")
 					.build();
 
 			return response;
 		}
 	};
 
-	public static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR_FIRST = chain -> {
+	public static final Interceptor NETWORK_INTERCEPTOR = chain -> {
+		// リクエスト
 		Request original = chain.request();
-
-		// DLog.d(TAG, original.url().toString());
-
-
-		//header設定
 		Request request = original.newBuilder()
-				.header("Accept", "application/json")
-				.method(original.method(), original.body())
+				.removeHeader("Pragma")
+				.removeHeader("Cache-Control")
+				.header("Cache-Control", "public, max-age=60")
+				.build();
+		Response originalResponse = chain.proceed(request);
+
+		// レスポンス
+		Response response = originalResponse.newBuilder()
+				.removeHeader("Pragma")
+				.removeHeader("Cache-Control")
+				.header("Cache-Control", "public, max-age=60")
 				.build();
 
-		okhttp3.Response response = chain.proceed(request);
-
 		return response;
+
 	};
+
+
+	public static boolean isNetworkAvailable(Context context) {
+		ConnectivityManager cm =
+				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		return activeNetwork != null &&
+				activeNetwork.isConnectedOrConnecting();
+	}
 }
