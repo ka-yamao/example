@@ -5,7 +5,7 @@ marp: true
 # Kotlin サンプルアプリで勉強したこと共有します。
 
 - apply / also / let / run / with
-- ~~Navigation Component）~~
+- ~~Navigation Component~~
 
 ---
 
