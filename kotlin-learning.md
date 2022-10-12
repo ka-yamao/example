@@ -5,7 +5,7 @@ marp: true
 # Kotlin サンプルアプリで勉強したこと共有します。
 
 - apply / also / let / run / with
-- Navigation Component
+- ~~Navigation Component）~~
 
 ---
 
@@ -26,8 +26,11 @@ marp: true
 
 ```
 class Player(val name: String){
-    var age = 0
-    var team: String? = null
+  var age = 0
+  var team: String? = null
+  override fun toString(): String {
+    return "{name=$name, age=$age, team=$team}"
+  }
 }
 ```
 
@@ -37,8 +40,7 @@ class Player(val name: String){
 val player = Player("大谷翔平")
 player.age = 28
 player.team = "エンゼルス"
-
-print(player.team)
+print(player) // => {name=大谷翔平, age=28, team=エンゼルス}
 ```
 
 このようにまずクラスのインスタンスを生成し、そのインスタンスの各プロパティを設定していくというのが通常の手順です。
@@ -53,7 +55,7 @@ val player = Player("大谷翔平").apply{
   age = 28
   team = "エンゼルス"
 }
-print(player.team) // => エンゼルス
+print(player) // => {name=大谷翔平, age=28, team=エンゼルス}
 ```
 
 インスタンス生成と同時に apply を呼び出し、その後にラムダ式でプロパティを設定しています。
@@ -71,7 +73,7 @@ val player = Player("大谷翔平").also{
     it.age = 28
     it.team = "エンゼルス"
 }
-print(player.team) // => エンゼルス
+print(player) // => {name=大谷翔平, age=28, team=エンゼルス}
 ```
 
 also の中のラムダ式で、Player インスタンスは「it」で参照されています。こちらは省略不可です。
@@ -80,11 +82,6 @@ also の中のラムダ式で、Player インスタンスは「it」で参照さ
 
 - also は呼び出し元を「it」で参照し、省略不可
 - 戻り値は呼び出し元のインスタンス
-
-```
-apply の場合はラムダの中で(省略可能ですが)thisを使うため、クラスメソッドなどの内部処理で使用される場合、thisが指し示すものがラムダ内だけ変わってしまうという場合もあります。
-その点alsoは呼び出し元の参照用としてのthisを使用しないため、ラムダの内も外もthisの意味合いが変わらないという利点があります。
-```
 
 ---
 
@@ -98,7 +95,7 @@ val str = "hoge".let {
 print(str) // => HOGE
 ```
 
-let は apply や also とはまた違った利用方法で、プロパティを設定するのではなく、そのレシーバー（ここでは String クラス）に対してメソッドを実行するといった使い方が主になってきます。
+let は apply や also とはまた違った利用方法で、プロパティを設定するのではなく、そのレシーバー（ここでは String インスタンス）に対してメソッドを実行するといった使い方が主になってきます。
 
 - let は呼び出し元を it で参照し、省略不可
 - let の戻り値はラムダの結果
@@ -162,11 +159,11 @@ with はこれまでのスコープ関数と記述方法が異なるため、若
 
 ---
 
-# Android アプリでの利用例をいくつか
+# Android アプリでの利用例をちょっとだけ紹介
 
 ### apply, run, also
 
-- https://github.com/ka-yamao/umpire/blob/3cdf3b6b27fc7193d507151d67417d4d855d22bd/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L86
+- https://github.com/ka-yamao/umpire/blob/a756f1ffcb5fcb4e31b3953096cfa50f246f9668/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L87
 
 ---
 
@@ -186,6 +183,5 @@ with はこれまでのスコープ関数と記述方法が異なるため、若
 
 - https://qiita.com/ngsw_taro/items/d29e3080d9fc8a38691e
 - https://qiita.com/JohnSmithWithHaruhi/items/e8f411c379483d4902aa
-- https://pouhon.net/kotlin-sfunction/1392/
 
 ---

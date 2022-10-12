@@ -13,7 +13,7 @@
 <h1>Kotlin サンプルアプリで勉強したこと共有します。</h1>
 <ul>
 <li>apply / also / let / run / with</li>
-<li>Navigation Component</li>
+<li><s>Navigation Component）</s></li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2">
@@ -32,16 +32,18 @@
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="4">
 <h1>こんなクラスがあっっとします。</h1>
 <pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>class Player(val name: String){
-    var age = 0
-    var team: String? = null
+  var age = 0
+  var team: String? = null
+  override fun toString(): String {
+    return &quot;{name=$name, age=$age, team=$team}&quot;
+  }
 }
 </span></span></foreignObject></svg></code></pre>
 <p>このクラスのインスタンスを生成してプロパティを設定するには、</p>
 <pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>val player = Player(&quot;大谷翔平&quot;)
 player.age = 28
 player.team = &quot;エンゼルス&quot;
-
-print(player.team)
+print(player) // =&gt; {name=大谷翔平, age=28, team=エンゼルス}
 </span></span></foreignObject></svg></code></pre>
 <p>このようにまずクラスのインスタンスを生成し、そのインスタンスの各プロパティを設定していくというのが通常の手順です。<br />
 このあと、Player class を使って説明します。</p>
@@ -52,7 +54,7 @@ print(player.team)
   age = 28
   team = &quot;エンゼルス&quot;
 }
-print(player.team) // =&gt; エンゼルス
+print(player) // =&gt; {name=大谷翔平, age=28, team=エンゼルス}
 </span></span></foreignObject></svg></code></pre>
 <p>インスタンス生成と同時に apply を呼び出し、その後にラムダ式でプロパティを設定しています。<br />
 戻り値はプロパティが設定されたレシーバー（Player インスタンス）になります。</p>
@@ -67,7 +69,7 @@ print(player.team) // =&gt; エンゼルス
     it.age = 28
     it.team = &quot;エンゼルス&quot;
 }
-print(player.team) // =&gt; エンゼルス
+print(player) // =&gt; {name=大谷翔平, age=28, team=エンゼルス}
 </span></span></foreignObject></svg></code></pre>
 <p>also の中のラムダ式で、Player インスタンスは「it」で参照されています。こちらは省略不可です。</p>
 <p>この it はラムダ式の引数が 1 つだけのときに使える it であり、つまり also は呼び出し元を、ラムダの引数として扱っているということになります。</p>
@@ -75,9 +77,6 @@ print(player.team) // =&gt; エンゼルス
 <li>also は呼び出し元を「it」で参照し、省略不可</li>
 <li>戻り値は呼び出し元のインスタンス</li>
 </ul>
-<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>apply の場合はラムダの中で(省略可能ですが)thisを使うため、クラスメソッドなどの内部処理で使用される場合、thisが指し示すものがラムダ内だけ変わってしまうという場合もあります。
-その点alsoは呼び出し元の参照用としてのthisを使用しないため、ラムダの内も外もthisの意味合いが変わらないという利点があります。
-</span></span></foreignObject></svg></code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7">
 <h1>let</h1>
@@ -87,7 +86,7 @@ print(player.team) // =&gt; エンゼルス
 }
 print(str) // =&gt; HOGE
 </span></span></foreignObject></svg></code></pre>
-<p>let は apply や also とはまた違った利用方法で、プロパティを設定するのではなく、そのレシーバー（ここでは String クラス）に対してメソッドを実行するといった使い方が主になってきます。</p>
+<p>let は apply や also とはまた違った利用方法で、プロパティを設定するのではなく、そのレシーバー（ここでは String インスタンス）に対してメソッドを実行するといった使い方が主になってきます。</p>
 <ul>
 <li>let は呼び出し元を it で参照し、省略不可</li>
 <li>let の戻り値はラムダの結果</li>
@@ -143,10 +142,10 @@ print(p)  // =&gt; 大谷翔平
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="11">
-<h1>Android アプリでの利用例をいくつか</h1>
+<h1>Android アプリでの利用例をちょっとだけ紹介</h1>
 <h3>apply, run, also</h3>
 <ul>
-<li><a href="https://github.com/ka-yamao/umpire/blob/3cdf3b6b27fc7193d507151d67417d4d855d22bd/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L86">https://github.com/ka-yamao/umpire/blob/3cdf3b6b27fc7193d507151d67417d4d855d22bd/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L86</a></li>
+<li><a href="https://github.com/ka-yamao/umpire/blob/a756f1ffcb5fcb4e31b3953096cfa50f246f9668/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L87">https://github.com/ka-yamao/umpire/blob/a756f1ffcb5fcb4e31b3953096cfa50f246f9668/android/app/src/main/java/com/c/local/umpire/fragment/GamesFragment.kt#L52-L87</a></li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12">
@@ -193,7 +192,6 @@ print(p)  // =&gt; 大谷翔平
 <ul>
 <li><a href="https://qiita.com/ngsw_taro/items/d29e3080d9fc8a38691e">https://qiita.com/ngsw_taro/items/d29e3080d9fc8a38691e</a></li>
 <li><a href="https://qiita.com/JohnSmithWithHaruhi/items/e8f411c379483d4902aa">https://qiita.com/JohnSmithWithHaruhi/items/e8f411c379483d4902aa</a></li>
-<li><a href="https://pouhon.net/kotlin-sfunction/1392/">https://pouhon.net/kotlin-sfunction/1392/</a></li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14"></section>
